@@ -6,7 +6,7 @@
 
 /*==== global variables =====*/
 int currentLine = 0; /* represents the managed line number */
-boolean isError = FALSE; /*flag represent if files read contains error*/
+boolean isError = FALSE; /*flag represent if a file read contains an error*/
 int IC = 0; /* Instruction counter*/
 
 /* Params parse function declaration  */
@@ -179,7 +179,6 @@ void parseDataParams(lineInfo*line){
             ERORR_MSG(("Invalid \',\' char - Expect to get a number before comma\n"));
             return;
         }
-
         /* check if param is a valid number or macro*/
         if(isMacroExist(nextWord))
             parameterValue = getSymbolValue(nextWord);
@@ -216,8 +215,10 @@ void parseStringParams(lineInfo*line){
     rightTrim(nextWord);
 
     /*validate parameter format*/
-    if(!isLegalStringParam(nextWord))
+    if(!isLegalStringParam(nextWord)) {
+        printf("isError = %u\n", isError);
         return;
+    }
 
     /* increase lineStr to point to the next position after parameter*/
     line->lineStr += strlen(nextWord);
@@ -228,14 +229,13 @@ void parseStringParams(lineInfo*line){
     }
     /* map string to memory word in case there is no error */
     if(!isError)
-        /*add to addStringTo memory function */
-        printf("add to addStringTo memory function");
-
+        /*add to memory function - String */
+        printf("add function");
     printf("\n----=====String Instruction====-----\n");
     return;
 }
 
-/* Parse extern/ entry instruction - check for validity and detect parameter
+/* Parse extern/ entry params - check for validity and detect parameter
  * In case of extern add the parameter to the symbol list*/
 void parseExtEntParams(lineInfo*line){
     char nextWord[MAX_LINE_LEN];
@@ -261,25 +261,8 @@ void parseExtEntParams(lineInfo*line){
     if(line->instStruct->type == EXTERN)
         addSymbol(createSymbol(nextWord,INSTRUCTION,EXTERN,EXTERN_DEFAULT_ADDRESS));
 
-    printf("\n----=====%s Instruction====-----\n",(line->instStruct->type == EXTERN)? EXTERN_STR : ENTRY_STR);
+    printf("\n----=====%s Instruction====-----\n",line->instStruct->string );
     return;
-}
-
-/*Parse data or string instruction - check for validity, parse params and update symbol if exist  */
-void parseDataStringInstruction(lineInfo*line){
-    /* If exist update label in symbol list */
-    if (line->isContainLabel){
-        addSymbol(createSymbol(line->labelValue,INSTRUCTION,line->instStruct->type,getDC()));
-    }
-
-    /* check for empty parameters */
-    if (isEmptySTR(line->lineStr)){
-        ERORR_MSG(("No parameter on %s declaration - Expecting for exactly 1 parameter\n",(line->instStruct->string)));
-        return;
-    }
-    /* call params parsing functions  */
-    line->instStruct->parseParamFunction;
-
 }
 
 /* handle instruction label

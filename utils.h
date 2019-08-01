@@ -16,7 +16,7 @@ extern boolean isError;
 #define ERORR_MSG(msgParams)\
     printf("Error in line %d:\n",currentLine);\
     printf msgParams;\
-    isError == TRUE;
+    isError = TRUE;
 
 /* check if ptr is NULL or not
  * In case of null print error massage and exit program
