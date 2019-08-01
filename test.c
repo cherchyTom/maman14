@@ -10,6 +10,8 @@ int main(int argc, char *argv[]){
     char line[MAX_LINE_LEN+1];
     int i;
 
+
+
     if(argc<=1) {
         perror("Please run with at list one file name argument\n");
         return 1;
