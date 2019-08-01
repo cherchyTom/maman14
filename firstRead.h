@@ -36,7 +36,7 @@ typedef struct{
     boolean isContainLabel;			/* A pointer to the lines label in labelArr */
     char labelValue[MAX_LABEL_LEN+1]; /*contains label value if exist */
     sentanceType lineType;       /* code, instruction or macro*/
-    instructionType instType;   /* Type of instruction - data, string, extern or entry */
+    const instruction *instStruct;   /* pointer to instruction struct - data, string, extern or entry */
 
 
     char *commandStr;			/* The string of the command or instruction */

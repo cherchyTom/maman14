@@ -20,6 +20,12 @@
 #define FIRST_ADDRESS 100
 #define EXTERN_DEFAULT_ADDRESS 0
 
+/*===== Delimiter Chars ===== */
+#define COMMA ','
+#define SPACE ' '
+#define COLON ':'
+
+
 
 /*===== data structures ===== */
 typedef enum {FALSE = 0, TRUE} boolean;

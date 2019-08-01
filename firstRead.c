@@ -9,19 +9,19 @@ int currentLine = 0; /* represents the managed line number */
 boolean isError = FALSE; /*flag represent if files read contains error*/
 int IC = 0; /* Instruction counter*/
 
-/* Instruction Parse function declaration  */
-void parseDataInstruction(lineInfo*line);
-void parseStringInstruction(lineInfo*line);
-void parseExtEntInstructions(lineInfo*line);
+/* Params parse function declaration  */
+void parseDataParams(lineInfo*line);
+void parseStringParams(lineInfo*line);
+void parseExtEntParams(lineInfo*line);
 
 /* ====== Instructions List ====== */
 const instruction instructionArr[] =
-        {	/* Instruction Type | Parse Function */
-                { DATA, DATA_STR, parseDataInstruction} ,
-                { STRING, STRING_STR, parseStringInstruction} ,
-                { EXTERN,EXTERN_STR, parseExtEntInstructions},
-                { ENTRY,ENTRY_STR, parseExtEntInstructions},
-                { INVALID_INSTRUCTION,NULL,NULL } /* represent the end of the array */
+        {	/* Instruction Type |Instruction String | Parse Instruction Function | Parse Param Function */
+                { DATA, DATA_STR, parseDataParams} ,
+                { STRING, STRING_STR, parseStringParams} ,
+                { EXTERN,EXTERN_STR, parseExtEntParams},
+                { ENTRY,ENTRY_STR, parseExtEntParams},
+                { INVALID_INSTRUCTION,NULL,NULL} /* represent the end of the array */
         };
 
 
@@ -55,7 +55,7 @@ static boolean isMacroStatement(lineInfo *line){
     char nextWord[MAX_LINE_LEN+1];
     /*skip spaces and retrieve first word */
     leftTrim(&line->lineStr);
-    getNextWordByDelimiter(nextWord,line->lineStr,' ',sizeof(nextWord));
+    getNextWordByDelimiter(nextWord,line->lineStr,SPACE,sizeof(nextWord));
 
     if(!strcmp(nextWord,MACRO_STR)){
         line->lineStr += sizeof(MACRO_STR)-1;
@@ -73,7 +73,7 @@ static void macroParse(char* lineStr){
 
     /*skip spaces and retrieve macro label */
     leftTrim(&lineStr);
-    getNextWordByDelimiter(nextWord,lineStr,' ', sizeof(nextWord));
+    getNextWordByDelimiter(nextWord,lineStr,SPACE, sizeof(nextWord));
 
     /* check for macro label name validity */
     if(!isValidLabel(nextWord)){
@@ -94,7 +94,7 @@ static void macroParse(char* lineStr){
     /*skip the '=' and spaces and retrieve macro value*/
     lineStr++;
     leftTrim(&lineStr);
-    getNextWordByDelimiter(nextWord,lineStr,' ', sizeof(nextWord));
+    getNextWordByDelimiter(nextWord,lineStr,SPACE, sizeof(nextWord));
 
     /* check macro value validity*/
     if(!isLegalNum(nextWord,MEMORY_WORD_BITS,&macroValue))
@@ -127,7 +127,7 @@ static boolean isContainValidLabel(lineInfo *line){
         return FALSE;
     /*skip spaces and retrieve label name */
     leftTrim(&line->lineStr);
-    getNextWordByDelimiter(nextWord,line->lineStr,':',sizeof(nextWord));
+    getNextWordByDelimiter(nextWord,line->lineStr,COLON,sizeof(nextWord));
 
     /* check for label name validity */
     if(!isValidLabel(nextWord)){
@@ -141,23 +141,12 @@ static boolean isContainValidLabel(lineInfo *line){
     return TRUE;
 }
 
-/* Instruction Parse function declaration  */
-void parseDataInstruction(lineInfo*line){
+/*Parse data instruction - check for validity, coding parameter into memory words and update symbol if exist  */
+void parseDataParams(lineInfo*line){
 
     char nextWord[MAX_LINE_LEN];
     int parameterValue;
     boolean isCommaFound = 1; /*initiate to one due to first param does need a comma separator */
-
-    /* If exist update label in symbol list */
-    if (line->isContainLabel){
-        addSymbol(createSymbol(line->labelValue,INSTRUCTION,DATA,getDC()));
-    }
-
-    /* check for empty parameters */
-    if (isEmptySTR(line->lineStr)){
-        ERORR_MSG(("No parameter on %s declaration - Expecting for exactly 1 parameter\n",DATA_STR));
-        return;
-    }
 
     /* Find all the params and add them data list */
     while (!isEmptySTR(line->lineStr)){
@@ -172,13 +161,13 @@ void parseDataInstruction(lineInfo*line){
 
         /*skip spaces and retrieve next parameter */
         leftTrim(&line->lineStr);
-        getNextWordByDelimiter(nextWord,line->lineStr,',',sizeof(nextWord));
+        getNextWordByDelimiter(nextWord,line->lineStr,COMMA,sizeof(nextWord));
 
         /* increase lineStr to point to the next position after parameter*/
         line->lineStr += strlen(nextWord);
 
         /*check if comma exist after the parameter - update the flag and increase lineStr*/
-        if(*line->lineStr == ',') {
+        if(*line->lineStr == COMMA) {
             line->lineStr++;
             isCommaFound = TRUE;
         }
@@ -197,7 +186,11 @@ void parseDataInstruction(lineInfo*line){
         else if(!isLegalNum(nextWord,MEMORY_WORD_BITS,&parameterValue)) {
             return;
         }
-        /* map number to memory word */
+        /* map number to memory word in case there is no error */
+        if(!isError)
+            /*add to memory function */
+            printf("add function");
+
         printf("%d\n",parameterValue);
 
     }
@@ -210,30 +203,48 @@ void parseDataInstruction(lineInfo*line){
 
     return;
 }
-void parseStringInstruction(lineInfo*line){
+
+/*Parse string instruction - check for validity, coding parameter into memory words and update symbol if exist  */
+void parseStringParams(lineInfo*line){
+    char nextWord[MAX_LINE_LEN];
+
+    /*skip spaces and retrieve next parameter */
+    leftTrim(&line->lineStr);
+    getNextWordByDelimiter(nextWord,line->lineStr,SPACE,sizeof(nextWord));
+
+    /*remove spaces from end of parameter*/
+    rightTrim(nextWord);
+
+    /*validate parameter format*/
+    if(!isLegalStringParam(nextWord))
+        return;
+
+    /* increase lineStr to point to the next position after parameter*/
+    line->lineStr += strlen(nextWord);
+    /* validate there is no more parameter*/
+    if(!isEmptySTR(line->lineStr)){
+        ERORR_MSG(("Invalid parameter \"%s\"  on %s declaration - Expecting for exactly 1 parameter\n",line->lineStr,STRING_STR));
+        return;
+    }
+    /* map string to memory word in case there is no error */
+    if(!isError)
+        /*add to addStringTo memory function */
+        printf("add to addStringTo memory function");
+
     printf("\n----=====String Instruction====-----\n");
     return;
 }
 
 /* Parse extern/ entry instruction - check for validity and detect parameter
  * In case of extern add the parameter to the symbol list*/
-void parseExtEntInstructions(lineInfo*line){
+void parseExtEntParams(lineInfo*line){
     char nextWord[MAX_LINE_LEN];
-
-    /* remove label and warn about it*/
-    LABEL_WARNING(line)
 
     /*skip white spaces and get label*/
     leftTrim(&line->lineStr);
-    getNextWordByDelimiter(nextWord,line->lineStr,' ',sizeof(nextWord));
+    getNextWordByDelimiter(nextWord,line->lineStr,SPACE,sizeof(nextWord));
 
-    /*check if there is no params*/
-    if(isEmptySTR(nextWord)){
-        ERORR_MSG(("No parameter on %s declaration - Expecting for exactly 1 parameter\n",(line->instType == EXTERN)? EXTERN_STR : ENTRY_STR));
-        return;
-    }
-
-    /* check for label validity*/
+    /* check for param(label) validity*/
     if(!isValidLabel(nextWord))
         return;
 
@@ -242,41 +253,77 @@ void parseExtEntInstructions(lineInfo*line){
 
     /*validate line is over*/
     if(!isEmptySTR(line->lineStr)){
-        ERORR_MSG(("Too many arguments - Expecting for exactly 1 parameter on %s declaration\n",(line->instType == EXTERN)? EXTERN_STR : ENTRY_STR));
+        ERORR_MSG(("Too many arguments - Expecting for exactly 1 parameter on %s declaration\n",(line->instStruct->string)));
         return;
     }
 
     /*In case of extern instruction add declared parameter to symbol list*/
-    if(line->instType == EXTERN)
+    if(line->instStruct->type == EXTERN)
         addSymbol(createSymbol(nextWord,INSTRUCTION,EXTERN,EXTERN_DEFAULT_ADDRESS));
 
-    printf("\n----=====%s Instruction====-----\n",(line->instType == EXTERN)? EXTERN_STR : ENTRY_STR);
+    printf("\n----=====%s Instruction====-----\n",(line->instStruct->type == EXTERN)? EXTERN_STR : ENTRY_STR);
     return;
 }
 
+/*Parse data or string instruction - check for validity, parse params and update symbol if exist  */
+void parseDataStringInstruction(lineInfo*line){
+    /* If exist update label in symbol list */
+    if (line->isContainLabel){
+        addSymbol(createSymbol(line->labelValue,INSTRUCTION,line->instStruct->type,getDC()));
+    }
 
-/* Parse Instruction type and call to related parse function
+    /* check for empty parameters */
+    if (isEmptySTR(line->lineStr)){
+        ERORR_MSG(("No parameter on %s declaration - Expecting for exactly 1 parameter\n",(line->instStruct->string)));
+        return;
+    }
+    /* call params parsing functions  */
+    line->instStruct->parseParamFunction;
+
+}
+
+/* handle instruction label
+ * For data / string add label to symbol list
+ * For entry / extern remove label and warn about it*/
+void parseInstructionLabel(lineInfo *line){
+    /* If label does not exist */
+    if (!line->isContainLabel)
+        return;
+    /*in case of data or string instruction add label to symbol list*/
+    if(line->instStruct->type == DATA || line->instStruct->type == STRING)
+        addSymbol(createSymbol(line->labelValue, INSTRUCTION, line->instStruct->type, getDC()));
+    else
+    /* In case of entry or extern instruction remove label and warn about it*/
+    LABEL_WARNING(line)
+
+    return;
+}
+
+/* Parse Instruction type, check for parameter exist and  call related parse function
  * In case instruction does not exist set an error message */
-void instructionParse (lineInfo *line) {
+void parseInstruction (lineInfo *line) {
     char nextWord[MAX_LINE_LEN+1];
-    const instruction *instStruct;
     /* set line type */
     line->lineType = INSTRUCTION;
 
     /* get instruction value */
-    getNextWordByDelimiter(nextWord,line->lineStr,' ',sizeof(nextWord));
-    instStruct = getInstructionByName(nextWord);
+    getNextWordByDelimiter(nextWord,line->lineStr,SPACE,sizeof(nextWord));
+    line->instStruct = getInstructionByName(nextWord);
 
     /*validate instruction name*/
-    if(instStruct->type == INVALID_INSTRUCTION){
+    if(line->instStruct->type == INVALID_INSTRUCTION){
         ERORR_MSG(("Invalid instruction name: \"%s\"\n",nextWord));
         return;
     }
 
-    /*set lines parameters and call to related parse function */
-    line->instType = instStruct->type;
-    line->lineStr += strlen(instStruct->string);
-    instStruct->parseFunction(line);
+    /*set lineStr position  */
+    line->lineStr += strlen(line->instStruct->string);
+
+    /*parse instruction line label*/
+    parseInstructionLabel(line);
+
+    /*call to related parse function*/
+    line->instStruct->parseParamFunction(line);
 
     return;
 }
@@ -305,7 +352,7 @@ static void lineParse(lineInfo *line){
     }
 
     if(isInstruction(line)) {
-        instructionParse(line);
+        parseInstruction(line);
     }
 
     //getLineInstructionType(line)

@@ -10,6 +10,7 @@
 //#include "firstRead.h"
 
 /*======= Data Structures=======*/
+
 /*
  * data structure of command including:
  * command name
@@ -39,13 +40,13 @@ typedef struct
  * data structure of instruction including:
  * instruction type
  * instruction string
- * instruction parse function
+ * params parse function
  */
 typedef struct
 {
     instructionType type;
     char *string;
-    void(*parseFunction)();
+    void(*parseParamFunction)();
 } instruction;
 
 /* ====== Functions Prototypes====== */
