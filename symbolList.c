@@ -3,20 +3,10 @@
 //
 #include "symbolList.h"
 
-/*data counter*/
-static DC = 0;
-
 /*pointers to symbol list head and tail*/
 static symbol *listHead;
 static symbol *listTail;
 
-int getDC(){
-    return DC;
-}
-void increaseDC(){
-    DC++;
-    return;
-}
 
 symbol* getSymbolListHead(){
     return listHead;
@@ -35,7 +25,7 @@ symbol* createSymbol(char *label,sentanceType symbolType,instructionType instTyp
     newSymbol->instType = instType;
     newSymbol->value = value;
     newSymbol->next = NULL;
-    return;
+    return newSymbol;
 }
 
 void addSymbol(symbol* newSymbol){
@@ -59,8 +49,6 @@ void addSymbol(symbol* newSymbol){
 
 void ClearSymbolTable (){
     symbol* symbol1ToDelete;
-    /*init DC */
-    DC = 0;
     /*free table memory*/
     while (listHead){
         symbol1ToDelete = listHead;

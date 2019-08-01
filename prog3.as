@@ -1,10 +1,7 @@
+LIST: .data   6, -9, len
+STR:          .string  "abcdef"
 
-.define len = 4
+	.string "ddg" fdg
 
-
-	.data   6,, -9, len
-
-	.data   ,5, -7, len
-
-K:	      .data  22
+	.string "ddg"
 

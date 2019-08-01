@@ -18,6 +18,8 @@
 #define MAX_LABEL_LEN 31
 #define MEMORY_WORD_BITS 14
 #define FIRST_ADDRESS 100
+#define MEMORY_SIZE 4096
+#define MAX_MEMORY_WORDS MEMORY_SIZE-FIRST_ADDRESS
 #define EXTERN_DEFAULT_ADDRESS 0
 
 /*===== Delimiter Chars ===== */
