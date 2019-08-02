@@ -30,6 +30,12 @@ typedef struct memoryWord_s/* 14 bits */
             unsigned int  : 4;            /* Unused Bit */
         } firstCmd;
 
+        /* immediate addressing operand value */
+        struct {
+            unsigned int are : 2;       /* are type */
+            int value : 12;             /* address or offset value */
+        } operandValue;
+
         /* addressWord - memory address or offset (array offset) */
         struct {
             unsigned int are : 2;       /* are type */
