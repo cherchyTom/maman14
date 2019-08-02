@@ -36,6 +36,24 @@ const instruction instructionArr[] =
 
 
 /*====== Functions ====== */
+static boolean isStrNumber(char *str){
+    /*empty string*/
+    if(!str)
+        return FALSE;
+
+    /*check for a sign symbol and skip it*/
+    if(*str == '+' || *str == '-')
+        str++;
+
+    /* in case non digit is found return true*/
+    while (*str != '\0'){
+        if(!isdigit(*str))
+            return FALSE;
+        str++;
+    }
+    /* all chars are white spaces*/
+    return TRUE;
+}
 
 /* Return true  ';' appears at the beginning of the line otherwise false*/
 static isCommentLine(char *line){
@@ -317,7 +335,66 @@ static boolean isInstruction(lineInfo*line){
     leftTrim(&line->lineStr);
     return (*line->lineStr == '.') ? TRUE : FALSE;
 }
+/* return true if theris a valid opcode otherwise false */
+static boolean isVolidoPode(lineInfo *line){
+    char nextWord[MAX_LINE_LEN+1];
+    /*skip spaces and retrieve first word */
+    leftTrim(&line->lineStr);
+    getNextWordByDelimiter(nextWord,line->lineStr,SPACE,sizeof(nextWord));
 
+    line->cmd = getCmdCode(nextWord);
+    if(line->cmd){
+        line->lineStr += sizeof(line->cmd->name)-1;
+        return TRUE;
+    }
+    return FALSE;
+}
+operandInfo getAddresMethod(lineInfo * line){
+    operandInfo info;
+    char nextWord[MAX_LINE_LEN+1];
+    leftTrim(&line->lineStr);
+    getNextWordByDelimiter(nextWord,line->lineStr,SPACE,sizeof(nextWord));
+
+    if(isStrNumber(nextWord) || isMacroExist(nextWord)) {
+        info.value = atoi(nextWord);/*i dont hava anymore time, sury*/
+        info.type = NUMBER;
+        info.address = IC;
+        return info;
+    }
+    if  (getRegCode(line->lineStr)){
+
+
+    }
+
+    return info;
+}
+static boolean andLine(lineInfo *line){
+    int i = 0;
+    leftTrim(&line->lineStr);
+    if (!*line->lineStr)
+        return TRUE;
+    else
+        return FALSE;
+}
+
+static boolean case023(lineInfo * line){/*mov, add, sub, */
+
+    line->sourceOp  = getAddresMethod(line);
+    if  (line->sourceOp.type == NUMBER || line->sourceOp.type == LABEL || line->sourceOp.type == ARR || line->sourceOp.type == REGISTER ) {
+        if (*line->lineStr == COMMA) {
+            line->lineStr++;
+            line->targetOp = getAddresMethod(line);
+            if (line->targetOp.type == LABEL || line->targetOp.type == ARR  || line->targetOp.type == REGISTER) {
+                if (andLine(line))
+                    return TRUE;
+            }
+            else line->targetOp.type = INVALID;
+        }
+        else  ERORR_MSG(("Not comma\n"));
+    }
+    else line->sourceOp.type = INVALID;
+    return  FALSE;
+}
 static void lineParse(lineInfo *line){
 
     line->lineStr = line->originalString;
@@ -340,10 +417,26 @@ static void lineParse(lineInfo *line){
 
     //getLineInstructionType(line)
     return;
-
-
+    if(isVolidoPode(line)) {
+        switch(line->cmd->opcode){
+            case 0: case 2: case 3: case023(&line);
+                break;
+            case 1:/* cmp*/
+                break;
+            case 6:    /*lea*/
+                break;
+            case 4: case 5: case 7: case 8: case 11:/*nor, clr, inc, dec, red*/
+                break;
+            case 9: case 10: case 13:/*jmp, bne, jsr*/
+                break;
+            case 12:/*prn*/
+                break;
+            case 14: case 15:/* rts, stop*//* finish, only check ther is end line */
+                break;
+            default: return; /* no command has been found */
+        }
+    }
 }
-
 
 int firstRead(FILE*fd){
     lineInfo line;

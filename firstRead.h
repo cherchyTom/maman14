@@ -17,7 +17,7 @@
 
 
 /* Operands */
-typedef enum {INVALID = -1,NUMBER = 0, LABEL = 1, /* variable ? = 2 */ REGISTER = 3} operandType;
+typedef enum {INVALID = -1,NUMBER = 0, LABEL = 1,  ARR = 2, REGISTER = 3} operandType;
 
 typedef struct{
     operandType type;		/* Type */
