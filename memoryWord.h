@@ -67,4 +67,52 @@ int getDC();
 /*Increase by one data counter (DC) */
 void increaseDC();
 
+/* return current code counter */
+int getIC();
+
+/*Increase by one data counter (IC) */
+void increaseIC();
+
+/*initiate DC */
+void resetDC();
+
+/*initiate IC */
+void resetIC();
+
+
+/* create memory word record set it in list and return a pointer to it */
+memoryWord* createMemoryWord(segmentType segType);
+
+/* get first code memory params and add it to code memory list
+ * @params - are code, dest & src operands addressing code, operation code */
+void addFirstCodeMemoryWord(areType are, int dest, int src,int opcode);
+
+/* get immediate operand value and add it to code memory list
+ * @params - operand value  */
+void addOpValueMemoryWord(int value);
+
+/* get address or offset  memory word params and add it to code memory list
+ * @params - are code, value (operand address or array offset) */
+void addAddressMemoryWord(areType are, int value);
+
+/* get register values and add it to code memory list
+ * @params - dest and src registers code
+ * in case of only one register is represented the second one will be set to zero*/
+void addRegisterMemoryWord(int dest, int src);
+
+/* get int param and add it to data memory list*/
+void addDataMemoryWord(int param);
+
+/* get string param and code it to data memory words*/
+void addStringMemoryWord(char* param);
+
+/* update data memory word address by given offset */
+void updateDataSegmentByOffset(int offset);
+
+/* update data memory word address by given offset */
+void mergeCodeAndDataSegments();
+
+/* clear memory word list */
+void ClearMemoryWordList ();
+
 #endif //MAMAN14_MEMORYWORD_H

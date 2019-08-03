@@ -54,7 +54,7 @@ static void addToMemoryList(memoryWord **listHead,memoryWord **listTail, memoryW
     }
 
     /*list is not empty */
-    *listTail->nextWord = newWord;
+    (*listTail)->nextWord = newWord;
     *listTail= newWord;
 }
 
@@ -164,6 +164,7 @@ void updateDataSegmentByOffset(int offset){
 
     for(tmp = dataListHead; tmp != NULL; tmp = tmp->nextWord)
         tmp->address += offset;
+    return;
 }
 
 
