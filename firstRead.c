@@ -355,18 +355,55 @@ operandInfo getAddresMethod(lineInfo * line){
     leftTrim(&line->lineStr);
     getNextWordByDelimiter(nextWord,line->lineStr,SPACE,sizeof(nextWord));
 
-    if(isStrNumber(nextWord) || isMacroExist(nextWord)) {
-        info.value = atoi(nextWord);/*i dont hava anymore time, sury*/
+    if(isStrNumber(nextWord)) {
+        info.value = atoi(nextWord);
         info.type = NUMBER;
         info.address = IC;
+        line->lineStr += (int)sizeof(nextWord);
+        return info;
+    }
+    if (isMacroExist(nextWord)) {
+        info.value = getSymbolValue(nextWord);
+        info.type = NUMBER;
+        info.address = IC;
+        line->lineStr += (int)sizeof(nextWord);
         return info;
     }
     if  (getRegCode(line->lineStr)){
-
-
+        info.type = REGISTER;
+        info.value = getRegCode(line->lineStr);
+        info.address = IC;
+        line->lineStr += (int)sizeof(nextWord);
+        return info;
     }
-
-    return info;
+    getNextWordByDelimiter(nextWord,nextWord,'[',sizeof(nextWord));
+    if (isValidLabel(nextWord)){
+        strcpy(info.str,nextWord);
+        line->lineStr += (int)sizeof(nextWord)+1;/* +1 for '[' */
+        getNextWordByDelimiter(nextWord,nextWord,']',sizeof(nextWord));
+        if(isStrNumber(nextWord)) {
+            info.value = atoi(nextWord);
+            info.type = ARR;
+            info.address = IC;
+            line->lineStr += (int)sizeof(nextWord)+1;
+            return info;
+        }
+        else if (isMacroExist(nextWord)) {
+            info.value = getSymbolValue(nextWord);
+            info.type = ARR;
+            info.address = IC;
+            line->lineStr += (int) sizeof(nextWord) + 1;
+            return info;
+        }
+    }
+    if (isValidLabel(nextWord)){
+        strcpy(info.str,nextWord);
+        info.type = LABEL;
+        info.address = IC;
+        line->lineStr += (int) sizeof(nextWord) + 1;
+        return info;
+    }
+    return info;/*WE NEDD TO TETURM ERROR NOW*/
 }
 static boolean andLine(lineInfo *line){
     int i = 0;
