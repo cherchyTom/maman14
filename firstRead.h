@@ -12,6 +12,7 @@
 #include "constsTables.h"
 #include "txtAnalyzer.h"
 #include "symbolList.h"
+#include "memoryWord.h"
 
 /*=========Data Structures======*/
 

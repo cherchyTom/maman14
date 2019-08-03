@@ -150,8 +150,10 @@ void addDataMemoryWord(int param){
 void addStringMemoryWord(char* param){
     /* code all the chars between " " to memory words */
     param++; /*skip first '"'*/
-    while(*param != '"')
-        addDataMemoryWord((int)(*param));
+    while(*param != '"') {
+        addDataMemoryWord((int) (*param));
+        param++;
+    }
     return;
 }
 

@@ -52,9 +52,9 @@ typedef struct
 /* ====== Functions Prototypes====== */
 
 /*
- * get command name and return its code or -1 if not exist
+ * get command name and return pointer to its struct or NULL if not exist
  */
-int getCmdCode(char* cmdName);
+const command* getCmdCode(char* cmdName);
 
 /*
  * get command name and return its number of params or -1 if not exist

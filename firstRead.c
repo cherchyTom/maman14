@@ -205,10 +205,8 @@ void parseDataParams(lineInfo*line){
         }
         /* map number to memory word in case there is no error */
         if(!isError)
-            /*add to memory function */
-            printf("add function");
+            addDataMemoryWord(parameterValue);
 
-        printf("%d\n",parameterValue);
 
     }
 
@@ -234,7 +232,6 @@ void parseStringParams(lineInfo*line){
 
     /*validate parameter format*/
     if(!isLegalStringParam(nextWord)) {
-        printf("isError = %u\n", isError);
         return;
     }
 
@@ -247,8 +244,7 @@ void parseStringParams(lineInfo*line){
     }
     /* map string to memory word in case there is no error */
     if(!isError)
-        /*add to memory function - String */
-        printf("add function");
+        addStringMemoryWord(nextWord);
     printf("\n----=====String Instruction====-----\n");
     return;
 }
@@ -335,19 +331,29 @@ static boolean isInstruction(lineInfo*line){
     leftTrim(&line->lineStr);
     return (*line->lineStr == '.') ? TRUE : FALSE;
 }
-/* return true if theris a valid opcode otherwise false */
-static boolean isVolidoPode(lineInfo *line){
+
+/* return true if there is a valid command name otherwise false */
+static boolean isValidCommandName(lineInfo *line){
     char nextWord[MAX_LINE_LEN+1];
     /*skip spaces and retrieve first word */
     leftTrim(&line->lineStr);
     getNextWordByDelimiter(nextWord,line->lineStr,SPACE,sizeof(nextWord));
 
-    line->cmd = getCmdCode(nextWord);
-    if(line->cmd){
-        line->lineStr += sizeof(line->cmd->name)-1;
-        return TRUE;
+    /* check for empty command name */
+    if(isEmptySTR(nextWord)){
+        ERORR_MSG(("Empty command - Expect to get a valid command "));
+        return FALSE;
     }
-    return FALSE;
+
+    /*get command and check for its validity */
+    line->cmd = getCmdCode(nextWord);
+    if(!line->cmd){
+        ERORR_MSG(("Invalid command name \'%s\"\n",nextWord));
+        return FALSE;
+    }
+    /* increase lineStr to next position */
+    line->lineStr += strlen(line->cmd->name);
+    return TRUE;
 }
 operandInfo getAddresMethod(lineInfo * line){
     operandInfo info;
@@ -395,25 +401,40 @@ static boolean case023(lineInfo * line){/*mov, add, sub, */
     else line->sourceOp.type = INVALID;
     return  FALSE;
 }
+
+/* Parse command type, check for operand exist and  call related parse function
+ * In case command does not exist set an error message */
+void parseCommand (lineInfo *line) {
+    char nextWord[MAX_LINE_LEN +1];
+
+    /*validate command name*/
+    if(!isValidCommandName)
+        return;
+
+}
 static void lineParse(lineInfo *line){
 
     line->lineStr = line->originalString;
 
-    /* check if line is a macro */
+    /* check if line is a macro  and parse it*/
     if(isMacroStatement(line)){
         printf("\n----=====MACRO====-----\n\n");
         macroParse(line->lineStr);
         return;
     }
 
-    /* check if line contain valid label*/
+    /* check if line contain valid label and parse it*/
     if(isContainValidLabel(line)){
         printf("\n----=====LABEL====-----\n\n");
     }
-
+    /* check if line is an instruction and parse it*/
     if(isInstruction(line)) {
         parseInstruction(line);
+        return;
     }
+
+    /*parse line as a command*/
+    parseCommand(line);
 
     //getLineInstructionType(line)
     return;

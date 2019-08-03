@@ -45,15 +45,15 @@ extern const instruction instructionArr[];
 
 /* ====== Functions ====== */
 
-int getCmdCode(char* cmdName){
+const command* getCmdCode(char* cmdName){
     const command* cmd = cmdArr;
     while(cmd->name){
         if(!strcmp(cmd->name,cmdName))
-            return cmd->opcode;
+            return cmd;
         cmd++;
     }
     /* command name was not found*/
-    return -1;
+    return NULL;
 }
 
 int getCmdNParams(char* cmdName){
