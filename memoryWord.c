@@ -81,13 +81,13 @@ memoryWord* createMemoryWord(segmentType segType){
 
 /* get first code memory params and add it to code memory list
  * @params - are code, dest & src operands addressing code, operation code */
-void addFirstCodeMemoryWord(areType are, int dest, int src,int opcode){
+void addFirstCodeMemoryWord(int dest, int src,int opcode){
     /* create new data word and validate success */
     memoryWord *firstCodeWord = createMemoryWord(CODE_SEGMENT);
     if(!firstCodeWord)
         return;
     /*set bits values*/
-    firstCodeWord->word.firstCmd.are = are;
+    firstCodeWord->word.firstCmd.are = ABSOLUTE; /* always zero at first code word */
     firstCodeWord->word.firstCmd.dest = dest;
     firstCodeWord->word.firstCmd.src = src;
     firstCodeWord->word.firstCmd.opcode = opcode;

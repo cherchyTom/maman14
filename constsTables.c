@@ -23,7 +23,7 @@ const command cmdArr[] =
                 { "jsr", 13, 1 } ,
                 { "rst", 14, 0 } ,
                 { "stop",15, 0 } ,
-                {NULL } /* represent the end of the array */
+                {NULL} /* represent the end of the array */
         };
 
 /* ====== Registers List ====== */
@@ -45,7 +45,7 @@ extern const instruction instructionArr[];
 
 /* ====== Functions ====== */
 
-const command* getCmdCode(char* cmdName){
+const command* getCmd(char* cmdName){
     const command* cmd = cmdArr;
     while(cmd->name){
         if(!strcmp(cmd->name,cmdName))
@@ -54,6 +54,17 @@ const command* getCmdCode(char* cmdName){
     }
     /* command name was not found*/
     return NULL;
+}
+
+static int getCmdCode(char* cmdName){
+    const command* cmd = cmdArr;
+    while(cmd->name){
+        if(!strcmp(cmd->name,cmdName))
+            return cmd->opcode;
+        cmd++;
+    }
+    /* command name was not found*/
+    return -1 ;
 }
 
 int getCmdNParams(char* cmdName){

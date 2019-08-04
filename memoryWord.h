@@ -85,7 +85,7 @@ memoryWord* createMemoryWord(segmentType segType);
 
 /* get first code memory params and add it to code memory list
  * @params - are code, dest & src operands addressing code, operation code */
-void addFirstCodeMemoryWord(areType are, int dest, int src,int opcode);
+void addFirstCodeMemoryWord(int dest, int src,int opcode);
 
 /* get immediate operand value and add it to code memory list
  * @params - operand value  */

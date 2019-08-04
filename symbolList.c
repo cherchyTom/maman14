@@ -81,6 +81,14 @@ int getSymbolValue(char* label){
     return symbol->value;
 }
 
+boolean isExternalSymbol(char* label){
+    symbol* symbol= searchSymbolByLabel(label);
+    if(!symbol){
+        return FALSE;
+    }
+    return (symbol->instType == EXTERN) ? TRUE : FALSE;
+}
+
 boolean isMacroExist(char* label) {
     symbol *symbol1ToCheck = searchSymbolByLabel(label);
     if (symbol1ToCheck && symbol1ToCheck->symbolType == MACRO)

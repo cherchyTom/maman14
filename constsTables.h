@@ -54,7 +54,7 @@ typedef struct
 /*
  * get command name and return pointer to its struct or NULL if not exist
  */
-const command* getCmdCode(char* cmdName);
+const command* getCmd(char* cmdName);
 
 /*
  * get command name and return its number of params or -1 if not exist

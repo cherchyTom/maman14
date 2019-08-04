@@ -36,23 +36,42 @@ const instruction instructionArr[] =
 
 
 /*====== Functions ====== */
-static boolean isStrNumber(char *str){
-    /*empty string*/
-    if(!str)
-        return FALSE;
 
-    /*check for a sign symbol and skip it*/
-    if(*str == '+' || *str == '-')
-        str++;
+/* copy content of source operand info struct to destination operand info struct */
+static void operandCopy(operandInfo* dest, operandInfo* src){
+    dest->type = src->type;
+    dest->value = src->value;
+    dest->address = src->address;
+    dest->isDefinedLabel = src->isDefinedLabel;
+    strcpy(dest->label,src->label);
+    dest->offset = src->offset;
+    return;
+}
 
-    /* in case non digit is found return true*/
-    while (*str != '\0'){
-        if(!isdigit(*str))
-            return FALSE;
-        str++;
-    }
-    /* all chars are white spaces*/
-    return TRUE;
+/* initiate content of operand info struct */
+static void resetOperand(operandInfo* operand){
+    operand->type = INVALID_OPERAND;
+    operand->value = 0; /* default memory value */
+    operand->address = 0;
+    operand->isDefinedLabel = FALSE;
+    *operand->label ='\0';
+    operand->offset = 0;
+    return;
+}
+
+/* initiate content of operand info struct */
+static void resetline(lineInfo* line) {
+    line->address = 0;
+    *line->originalString = '\0';
+    line->lineStr = line->originalString; /* set line pointer to beginning of original string  */
+    line->isContainLabel = FALSE;
+    *line->labelValue = '\0';
+    line->lineType = INVALID_SENTENCE;
+    line->instStruct = NULL;
+    line->cmd = NULL;
+    resetOperand(&line->sourceOp);
+    resetOperand(&line->targetOp);
+    return;
 }
 
 /* Return true  ';' appears at the beginning of the line otherwise false*/
@@ -115,7 +134,7 @@ static void macroParse(char* lineStr){
     getNextWordByDelimiter(nextWord,lineStr,SPACE, sizeof(nextWord));
 
     /* check macro value validity*/
-    if(!isLegalNum(nextWord,MEMORY_WORD_BITS,&macroValue))
+    if(!isLegalNum(nextWord,MEMORY_WORD_BITS,&macroValue,1))
         return;
     /* update lineStr to next position */
     lineStr+= strlen(nextWord);
@@ -159,6 +178,48 @@ static boolean isContainValidLabel(lineInfo *line){
     return TRUE;
 }
 
+/* get next parameter (or operand) from a string with parameters which are separated by comma
+*return true if retrieve a parameter or false in case if syntax error
+*@Param - Line info
+*@Param - pointer to flag if a comma where found before, the function validate its turned on and change it value depand on following comma
+*@Param - nextWord store the param*
+*/
+boolean getNextParameter(lineInfo *line, boolean *isCommaFound, char *nextWord){
+
+    /* check for a comma between every two params except of the first one */
+    if(!*isCommaFound) {
+        ERORR_MSG(("A comma must separate between two parameters\n"));
+        return FALSE;
+    }
+    /* Turn of comma flag */
+    *isCommaFound = FALSE;
+
+
+    /*skip spaces and retrieve next parameter */
+    leftTrim(&line->lineStr);
+    getNextWordByDelimiter(nextWord,line->lineStr,COMMA,MAX_LINE_LEN);
+
+    /*increase lineStr to next position after parameter*/
+    line->lineStr += strlen(nextWord);
+    leftTrim(&line->lineStr);
+
+    /*check if comma exist after the parameter - update the flag and increase lineStr*/
+    if(*line->lineStr == COMMA) {
+        line->lineStr++;
+        *isCommaFound = TRUE;
+    }
+    /*remove spaces from end of parameter*/
+    rightTrim(nextWord);
+
+    /*check for invalid comma at the beginning or middle of the parameter string*/
+    if(isEmptySTR(nextWord)){
+        ERORR_MSG(("Invalid \',\' char - Expect to get a number before comma\n"));
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
 /*Parse data instruction - check for validity, coding parameter into memory words and update symbol if exist  */
 void parseDataParams(lineInfo*line){
 
@@ -168,39 +229,13 @@ void parseDataParams(lineInfo*line){
 
     /* Find all the params and add them data list */
     while (!isEmptySTR(line->lineStr)){
-
-        /* check for a comma between every two params except of the first one */
-        if(!isCommaFound) {
-            ERORR_MSG(("A comma must separate between two parameters\n"));
+        /*get next parameter*/
+        if(!getNextParameter(line,&isCommaFound,nextWord))
             return;
-        }
-        /* initiate comma flag to false */
-        isCommaFound = FALSE;
-
-        /*skip spaces and retrieve next parameter */
-        leftTrim(&line->lineStr);
-        getNextWordByDelimiter(nextWord,line->lineStr,COMMA,sizeof(nextWord));
-
-        /* increase lineStr to point to the next position after parameter*/
-        line->lineStr += strlen(nextWord);
-
-        /*check if comma exist after the parameter - update the flag and increase lineStr*/
-        if(*line->lineStr == COMMA) {
-            line->lineStr++;
-            isCommaFound = TRUE;
-        }
-        /*remove spaces from end of parameter*/
-        rightTrim(nextWord);
-
-        /*check for invalid comma at the beginning or middle of the parameter string*/
-        if(isEmptySTR(nextWord)){
-            ERORR_MSG(("Invalid \',\' char - Expect to get a number before comma\n"));
-            return;
-        }
         /* check if param is a valid number or macro*/
         if(isMacroExist(nextWord))
             parameterValue = getSymbolValue(nextWord);
-        else if(!isLegalNum(nextWord,MEMORY_WORD_BITS,&parameterValue)) {
+        else if(!isLegalNum(nextWord,MEMORY_WORD_BITS,&parameterValue,1)) {
             return;
         }
         /* map number to memory word in case there is no error */
@@ -339,119 +374,293 @@ static boolean isValidCommandName(lineInfo *line){
     leftTrim(&line->lineStr);
     getNextWordByDelimiter(nextWord,line->lineStr,SPACE,sizeof(nextWord));
 
-    /* check for empty command name */
+    /* check for empty command name -> meaning label with no text after */
     if(isEmptySTR(nextWord)){
-        ERORR_MSG(("Empty command - Expect to get a valid command "));
+        ERORR_MSG(("No command/ instruction after label definition\n"));
         return FALSE;
     }
 
     /*get command and check for its validity */
-    line->cmd = getCmdCode(nextWord);
+    line->cmd = getCmd(nextWord);
     if(!line->cmd){
         ERORR_MSG(("Invalid command name \'%s\"\n",nextWord));
         return FALSE;
     }
-    /* increase lineStr to next position */
+    /* update line info & increase lineStr to next position */
+    line->lineType = CODE;
+    line->address = getIC();
     line->lineStr += strlen(line->cmd->name);
     return TRUE;
 }
-operandInfo getAddresMethod(lineInfo * line){
-    operandInfo info;
-    char nextWord[MAX_LINE_LEN+1];
-    leftTrim(&line->lineStr);
-    getNextWordByDelimiter(nextWord,line->lineStr,SPACE,sizeof(nextWord));
 
-    if(isStrNumber(nextWord)) {
-        info.value = atoi(nextWord);
-        info.type = NUMBER;
-        info.address = IC;
-        line->lineStr += (int)sizeof(nextWord);
-        return info;
-    }
-    if (isMacroExist(nextWord)) {
-        info.value = getSymbolValue(nextWord);
-        info.type = NUMBER;
-        info.address = IC;
-        line->lineStr += (int)sizeof(nextWord);
-        return info;
-    }
-    if  (getRegCode(line->lineStr)){
-        info.type = REGISTER;
-        info.value = getRegCode(line->lineStr);
-        info.address = IC;
-        line->lineStr += (int)sizeof(nextWord);
-        return info;
-    }
-    getNextWordByDelimiter(nextWord,nextWord,'[',sizeof(nextWord));
-    if (isValidLabel(nextWord)){
-        strcpy(info.str,nextWord);
-        line->lineStr += (int)sizeof(nextWord)+1;/* +1 for '[' */
-        getNextWordByDelimiter(nextWord,nextWord,']',sizeof(nextWord));
-        if(isStrNumber(nextWord)) {
-            info.value = atoi(nextWord);
-            info.type = ARR;
-            info.address = IC;
-            line->lineStr += (int)sizeof(nextWord)+1;
-            return info;
-        }
-        else if (isMacroExist(nextWord)) {
-            info.value = getSymbolValue(nextWord);
-            info.type = ARR;
-            info.address = IC;
-            line->lineStr += (int) sizeof(nextWord) + 1;
-            return info;
-        }
-    }
-    if (isValidLabel(nextWord)){
-        strcpy(info.str,nextWord);
-        info.type = LABEL;
-        info.address = IC;
-        line->lineStr += (int) sizeof(nextWord) + 1;
-        return info;
-    }
-    return info;/*WE NEDD TO TETURM ERROR NOW*/
-}
-static boolean andLine(lineInfo *line){
-    int i = 0;
-    leftTrim(&line->lineStr);
-    if (!*line->lineStr)
-        return TRUE;
-    else
+
+/* gets operand info and offset value from its second position (after '[' ) and check for its validity and remove last ']'
+ * assumption - offset can be positive only. the programmer responsibility to validate the offset does not make a segmentation fault */
+static boolean isValidOffset(operandInfo *opInfo, char* offset){
+    /*check for empty string */
+    if(isEmptySTR(offset)){
+        ERORR_MSG(("Invalid '[' - Expect to get an array offset in the format of \"[offset]\"\n"));
         return FALSE;
+    }
+    /*validate last char and remove it */
+    if(offset[strlen(offset)-1] != OFFSET_END){
+        ERORR_MSG(("Invalid offset param - Expect to get an array offset in the format of \"[offset]\"\n"));
+        return FALSE;
+    }
+    offset[strlen(offset)-1] = '\0';
+    /*validate offset is macro or defined number */
+    if(isMacroExist(offset))
+        opInfo->offset = getSymbolValue(offset);
+    else if(!isLegalNum(offset,ADDRESS_BITS,&opInfo->offset,0))
+        return FALSE;
+    /*validate offset is positive */
+    if(opInfo->offset < 0){
+        ERORR_MSG(("Invalid offset param \"%s\" - Offset must be positive\n",offset));
+        return FALSE;
+    }
+
+    return TRUE;
 }
 
-static boolean case023(lineInfo * line){/*mov, add, sub, */
+/* get operandInfo struct and operand value - validate operand and update info
+ * return true in case of valid operand else */
+static boolean getOperandInfo(operandInfo *opInfo, char*operand){
+    char *offsetStartPosition = NULL;
+    boolean isOffset = 0;
 
-    line->sourceOp  = getAddresMethod(line);
-    if  (line->sourceOp.type == NUMBER || line->sourceOp.type == LABEL || line->sourceOp.type == ARR || line->sourceOp.type == REGISTER ) {
-        if (*line->lineStr == COMMA) {
-            line->lineStr++;
-            line->targetOp = getAddresMethod(line);
-            if (line->targetOp.type == LABEL || line->targetOp.type == ARR  || line->targetOp.type == REGISTER) {
-                if (andLine(line))
-                    return TRUE;
-            }
-            else line->targetOp.type = INVALID;
-        }
-        else  ERORR_MSG(("Not comma\n"));
+    /*if number operand (immediate addressing)*/
+    if(*operand == '#'){
+        operand++; /*skip '#' */
+        /*validate operand is a defined macro or a number */
+        if(isMacroExist(operand))
+            opInfo->value = getSymbolValue(operand);
+        else if(!isLegalNum(operand,ADDRESS_BITS,&opInfo->value,1))
+            return FALSE;
+
+        opInfo->type = NUMBER;
+        return TRUE;
     }
-    else line->sourceOp.type = INVALID;
-    return  FALSE;
+    /*if register operand*/
+    opInfo->value = getRegCode(operand);
+    if(opInfo->value != -1){
+        opInfo->type = REGISTER;
+        return TRUE;
+    }
+
+    /*Check for offset in order to separate between label and offset*/
+    if(offsetStartPosition = strchr(operand,OFFSET_START)){
+        isOffset = 1;
+        *offsetStartPosition = '\0';
+        *offsetStartPosition++;
+    }
+
+    /*validate label name, update opInfo and retrieve its value if already defined */
+    if(!isValidLabel(operand)){
+        ERORR_MSG(("Invalid label name: \"%s\"\n",operand));
+        return FALSE;
+    }
+    opInfo->type = LABEL;
+    strcpy(opInfo->label,operand);
+    if(searchSymbolByLabel(operand)) {
+        opInfo->value = getSymbolValue(operand);
+        opInfo->isDefinedLabel = TRUE;
+    } else
+        opInfo->isDefinedLabel = FALSE;
+
+    /* handle offset if exist and update opInfo*/
+    if(isOffset){
+        if(!isValidOffset(opInfo,offsetStartPosition))
+            return FALSE;
+        opInfo->type = ARR;
+    }
+
+    return TRUE;
+}
+
+/* validate given command and operands types combinations
+ * get lineInfo line, return true if valid or false otherwise*/
+static boolean isValidOperandsType(lineInfo *line){
+    switch(line->cmd->opcode) {
+        /* mov,add,sub,not,clr,inc,dec,red */
+        case 0: case 2: case 3: case 4: case 5: case 7: case 8: case 11: {
+            if (line->targetOp.type == NUMBER) {
+                ERORR_MSG(("Invalid Operand Type: Target operand of \"%s\" cannot be a number\n", line->cmd->name));
+                return FALSE;
+            }
+            break;
+        }
+        /*lea*/
+        case 6: {
+            if (line->sourceOp.type == NUMBER || line->sourceOp.type == REGISTER) {
+                ERORR_MSG(("Invalid Operand Type: Source operand of \"%s\" must be a label or array\n", line->cmd->name));
+                return FALSE;
+            }
+            if (line->targetOp.type == NUMBER) {
+                ERORR_MSG(("Invalid Operand Type: Target operand of \"%s\" cannot be a number\n", line->cmd->name));
+                return FALSE;
+            }
+            break;
+        }
+        /*jmp,bne,jsr */
+        case 9: case 10: case 13: {
+            if (line->targetOp.type == NUMBER || line->targetOp.type == ARR) {
+                ERORR_MSG(("Invalid Operand Type: Target operand of \"%s\" must be a label or register\n", line->cmd->name));
+                return FALSE;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    return TRUE;
+}
+
+/* fine operands in cmd line, check their validity */
+static void parseOperands (lineInfo *line){
+    char nextWord[MAX_LINE_LEN];
+    int opCnt = 0; /* operands counter */
+    boolean isCommaFound = 1; /*if comma found before operand - initiate to 1 as first operand do not require a comma */
+
+    /* Find all the operands and add them to line info */
+    while (!isEmptySTR(line->lineStr)) {
+        /*get next parameter*/
+        if (!getNextParameter(line, &isCommaFound, nextWord))
+            return;
+        /*increase operand counter validate operands amount*/
+        if (++opCnt > line->cmd->numOfParams)
+            break;
+        /*update operand info*/
+        switch (opCnt) {
+            /*get first operand info into target operand */
+            case 1: {
+                if (!getOperandInfo(&line->targetOp, nextWord))
+                    return;
+                break;
+            }
+                /*copy target operand into source operand and get second operand info into target operand */
+            case 2: {
+                operandCopy(&line->sourceOp, &line->targetOp);
+                if (!getOperandInfo(&line->targetOp, nextWord))
+                    return;
+                break;
+            }
+            default:
+                break;
+        }
+
+    }
+
+    /*check if there is comma without a parameter at the end of line
+     * In case of not operands the initial flag will be on even there is no invalid comma*/
+    if(isCommaFound && opCnt >0){
+        ERORR_MSG(("There is a comma at the end of the line\n"));
+        return;
+    }
+
+    /*validate number of operands*/
+    if(line->cmd->numOfParams != opCnt){
+        ERORR_MSG(("Invalid amount of operands. \"%s\" expect to get exactly %d operands\n",line->cmd->name,line->cmd->numOfParams));
+        return;
+    }
+    /*validate operands Types*/
+    if(!isValidOperandsType(line)){
+        return;
+    }
+
+    return;
+}
+
+/* code single operand to memory word/s depend on its type
+ *Param - operand info struct to code
+ *Param - Flag isSourceOp - True for source operand False for destination operand*/
+
+static void codeOperandToMemory(operandInfo *opInfo, boolean isSourceOp) {
+
+    /*No operand */
+    if(opInfo->type == INVALID_OPERAND)
+        return;
+
+    /*add number operand */
+    if(opInfo->type == NUMBER){
+            addOpValueMemoryWord(opInfo->value);
+            return;
+    }
+
+    /*add register operand */
+    if(opInfo->type == REGISTER){
+        if(isSourceOp) /*source operand*/
+            addRegisterMemoryWord(DEFAULT_MEMORY_VALUE,opInfo->value);
+        else /*dest operand*/
+            addRegisterMemoryWord(opInfo->value,DEFAULT_MEMORY_VALUE);
+    return;
+    }
+
+    /*add LABEL / ARR operand */
+
+    /* check if label defined and update its address */
+    if(opInfo->isDefinedLabel) {
+        areType are = (isExternalSymbol(opInfo->label)) ? EXTENAL : RELOCATABLE; /*set are type*/
+        addAddressMemoryWord(are,opInfo->value);
+    }
+    /* in case if undefined label insert an empty word */
+    else {
+        opInfo->address = getIC(); /*keep memory address to update on second run*/
+        addAddressMemoryWord(DEFAULT_MEMORY_VALUE, DEFAULT_MEMORY_VALUE);
+    }
+    /* update offset word for array operand */
+    if(opInfo->type == ARR)
+        addAddressMemoryWord(ABSOLUTE,opInfo->offset);
+
+    return;
+}
+
+
+/* code command to memory - first word + operands
+ *Param - lineInfo
+*/
+static void codeCommandToMemory(lineInfo *line){
+    /* set operands addressing method */
+    int srcOpAddressingMethod = (line->sourceOp.type == INVALID_OPERAND) ? 0 : line->sourceOp.type;
+    int destOpAddressingMethod = (line->targetOp.type == INVALID_OPERAND) ? 0 : line->targetOp.type;
+
+    /*validate line represent a command*/
+    if(line->lineType != CODE)
+        return;
+    /*build first memory word */
+    addFirstCodeMemoryWord(destOpAddressingMethod,srcOpAddressingMethod,line->cmd->opcode);
+
+    /*Add Operands memory words */
+    /*in case 2 operands are registers insert them as 1 memory word*/
+    if(line->sourceOp.type == REGISTER && line->targetOp.type == REGISTER){
+        addRegisterMemoryWord(line->targetOp.value,line->sourceOp.value);
+        return;
+    }
+
+    codeOperandToMemory(&line->sourceOp,1); /* source operand */
+    codeOperandToMemory(&line->targetOp,0); /* target (dest) operand */
+    return;
 }
 
 /* Parse command type, check for operand exist and  call related parse function
  * In case command does not exist set an error message */
-void parseCommand (lineInfo *line) {
-    char nextWord[MAX_LINE_LEN +1];
+static void parseCommand (lineInfo *line) {
 
     /*validate command name*/
-    if(!isValidCommandName)
+    if(!isValidCommandName(line))
         return;
+    /*parse operands*/
+    parseOperands(line);
+
+    /*In case of no error code cmd to memory*/
+    if(!isError){
+        codeCommandToMemory(line);
+    }
+
 
 }
-static void lineParse(lineInfo *line){
 
-    line->lineStr = line->originalString;
+
+static void lineParse(lineInfo *line){
 
     /* check if line is a macro  and parse it*/
     if(isMacroStatement(line)){
@@ -473,34 +682,16 @@ static void lineParse(lineInfo *line){
     /*parse line as a command*/
     parseCommand(line);
 
-    //getLineInstructionType(line)
     return;
-    if(isVolidoPode(line)) {
-        switch(line->cmd->opcode){
-            case 0: case 2: case 3: case023(&line);
-                break;
-            case 1:/* cmp*/
-                break;
-            case 6:    /*lea*/
-                break;
-            case 4: case 5: case 7: case 8: case 11:/*nor, clr, inc, dec, red*/
-                break;
-            case 9: case 10: case 13:/*jmp, bne, jsr*/
-                break;
-            case 12:/*prn*/
-                break;
-            case 14: case 15:/* rts, stop*//* finish, only check ther is end line */
-                break;
-            default: return; /* no command has been found */
-        }
-    }
 }
 
 int firstRead(FILE*fd){
     lineInfo line;
+    resetline(&line); /*initiate lineInfo struct */
 
     while(readLine(fd,line.originalString,MAX_LINE_LEN)){
         currentLine++;
+
 
         /* check for line length validity */
         if(!isValidLineLength(line.originalString)){
@@ -514,12 +705,9 @@ int firstRead(FILE*fd){
 
         /* Parse the current line */
         lineParse(&line);
+        resetline(&line); /*initiate lineInfo struct */
 
         printf("%s\n",line.originalString);
-
-        /*clear line */
-        line.isContainLabel= FALSE;
-        line.labelValue[0] = '\0';
 
     }
 

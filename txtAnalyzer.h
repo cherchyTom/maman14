@@ -40,9 +40,10 @@ boolean isEmptySTR(char* str);
  * @Param *numStr - string to convert
  * @Param *numInt - pointer to save the converted number
  * @Param numOfBits - bits amount to save int number - for range validation
+ * @Param isSigned - 1 for sign range and 0 of unsigned range
  *return true in success otherwise return false
  */
-boolean isLegalNum(char *numStr, int numOfBits, int *numInt);
+boolean isLegalNum(char *numStr, int numOfBits, int *numInt, int isSigned);
 
 /* Returns if the strParam is a legal string param (enclosed in quotes), and remove the quotes
  * @param - pointer to char strParam*/

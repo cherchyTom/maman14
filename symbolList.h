@@ -57,6 +57,12 @@ void ClearSymbolTable();
 */
 symbol* searchSymbolByLabel(char* label);
 
+/* search a symbol in table by label
+* @params - symbol label
+* @return TRUE if instruction type is EXTERN otherwise false
+*/
+boolean isExternalSymbol(char* label);
+
 /* search a macro symbol in table by label
 * @params - symbol label
 * @return TRUE if exist otherwise false

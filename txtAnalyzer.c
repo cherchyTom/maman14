@@ -89,13 +89,17 @@ static boolean isStrNumber(char *str){
  * @Param *numStr - string to convert
  * @Param *numInt - pointer to save the converted number
  * @Param numOfBits - bits amount to save int number - for range validation
+ * @Param isSigned - 1 for sign range and 0 of unsigned range
  *return true in success otherwise return false
  */
-boolean isLegalNum(char *numStr, int numOfBits, int *numInt){
-
+boolean isLegalNum(char *numStr, int numOfBits, int *numInt, int isSigned){
+    /*max Unsigned number can be represented with #numOfBits = 2^n - 1 */
+    /*min Unsigned number is 0*/
     /*max signed number can be represented with #numOfBits = 2^(n-1) - 1 */
     /*min signed number can be represented with #numOfBits = -maxNum - 1*/
-    int maxNum = ((1 << (numOfBits-1)) - 1);
+    int n = numOfBits - isSigned;
+    int maxNum = (1 << n) - 1;
+    int minNum = (isSigned)? -maxNum -1 : 0;
     /*empty string*/
     if(!numStr || !*numStr){
         ERORR_MSG(("Empty parameter - expecting to get a number\n"));
@@ -111,8 +115,8 @@ boolean isLegalNum(char *numStr, int numOfBits, int *numInt){
 
     /* Check if the number within a range that is defined by given bits amount*/
 
-    if (*numInt > maxNum || *numInt < (-maxNum-1)){
-        ERORR_MSG(("\"%s\" is out of range, number must be between %d and %d.", numStr, -maxNum-1, maxNum));
+    if (*numInt > maxNum || *numInt < minNum){
+        ERORR_MSG(("\"%s\" is out of range, number must be between %d and %d.", numStr, minNum, maxNum));
         return FALSE;
     }
 
