@@ -7,8 +7,8 @@
 /* =======Global Variables ======*/
 
 /*pointers to symbol list head and tail*/
-static qLabel *qLabelListHead;
-static qLabel *qlabelListTail;
+static qLabel *queueHead;
+static qLabel *queueTail;
 
 /* crate qLabel Struct in memory validate creation */
 static qLabel* createQLabel(){
@@ -20,38 +20,40 @@ static qLabel* createQLabel(){
 }
 
 /* add qLabel struct to qLable queue */
-void addLabelToQ(qLabelType labelType, char *label, int address, int lineNumber){
+void addLabelToQ(qLabelType labelType, char *label,boolean isDefined, int address, int lineNumber){
     /*create new record*/
     qLabel *newLabel = createQLabel();
     /* copy data */
     newLabel->labelType = labelType;
     strcpy(newLabel->label,label);
+    newLabel->isDefined = isDefined;
     newLabel->address = address;
     newLabel->lineNumber = lineNumber;
 
     /*empty list*/
-    if(!qLabelListHead){
-        qLabelListHead = qlabelListTail = newLabel;
+    if(!queueHead){
+        queueHead = queueTail = newLabel;
         return;
     }
 
     /*add new symbol to list end*/
-    qlabelListTail->next = newLabel;
-    qlabelListTail = newLabel;
+    queueTail->next = newLabel;
+    queueTail = newLabel;
     return;
 }
 
 /*get params from of first label in queue
  * Params - pointers to variables to save struct fields*/
-void getNextLabelParams(qLabelType *type, char* label, int *address, int *lineNumber){
+void getNextLabelParams(qLabelType *type, char* label,boolean *isDefined, int *address, int *lineNumber){
     /*empty queue */
-    if(!qLabelListHead){
+    if(!queueHead){
         return;
     }
-    *type = qLabelListHead->labelType;
-    strcpy(label,qLabelListHead->label);
-    *address = qLabelListHead->address;
-    *lineNumber = qLabelListHead->lineNumber;
+    *type = queueHead->labelType;
+    strcpy(label,queueHead->label);
+    *isDefined = queueHead->isDefined;
+    *address = queueHead->address;
+    *lineNumber = queueHead->lineNumber;
     return;
 }
 
@@ -59,28 +61,28 @@ void getNextLabelParams(qLabelType *type, char* label, int *address, int *lineNu
 void removeLabelFromQ(){
     qLabel* labelToDelete;
     /*empty queue */
-    if(!qLabelListHead){
+    if(!queueHead){
         return;
     }
-    labelToDelete = qLabelListHead;
-    qLabelListHead = qLabelListHead->next;
+    labelToDelete = queueHead;
+    queueHead = queueHead->next;
     free(labelToDelete);
     return;
 }
 
 /*remove fisrt label from labels queue */
 boolean isEmptyQ(){
-    return(!qLabelListHead) ? TRUE : FALSE;
+    return(!queueHead) ? TRUE : FALSE;
 }
 
 /*delete lablesQ records and initiate global parameters */
 void ClearLablesQ (){
     qLabel *labelToDelete;
     /*free table memory*/
-    while (qLabelListHead){
-        labelToDelete = qLabelListHead;
-        qLabelListHead = qLabelListHead->next;
+    while (queueHead){
+        labelToDelete = queueHead;
+        queueHead = queueHead->next;
         free(labelToDelete);
     }
-    qLabelListHead = qlabelListTail = NULL;
+    queueHead = queueTail = NULL;
 }

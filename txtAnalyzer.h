@@ -45,10 +45,6 @@ boolean isEmptySTR(char* str);
  */
 boolean isLegalNum(char *numStr, int numOfBits, int *numInt, int isSigned);
 
-/* Returns if the strParam is a legal string param (enclosed in quotes), and remove the quotes
- * @param - pointer to char strParam*/
-boolean isLegalStringParam(char *strParam);
-
 /*
  * get Label/ Macro name and return true if is valid otherwise return true
  */

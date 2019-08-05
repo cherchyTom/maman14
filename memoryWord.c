@@ -139,9 +139,8 @@ void addDataMemoryWord(int param){
 
 /* get string param and code it to data memory words*/
 void addStringMemoryWord(char* param){
-    /* code all the chars between " " to memory words */
-    param++; /*skip first '"'*/
-    while(*param != '"') {
+    /* code all the chars to memory words */
+    while(*param) {
         addDataMemoryWord((int) (*param));
         param++;
     }

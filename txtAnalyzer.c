@@ -123,23 +123,6 @@ boolean isLegalNum(char *numStr, int numOfBits, int *numInt, int isSigned){
     return TRUE;
 }
 
-/* Returns if the strParam is a legal string param (enclosed in quotes), and remove the quotes
- * @param - pointer to char strParam*/
-boolean isLegalStringParam(char *strParam){
-
-    /*empty string*/
-    if(!strParam || !*strParam){
-        ERORR_MSG(("Empty parameter - expecting to get a string\n"));
-        return FALSE;
-    }
-    /* validate string param is enclosed in quotes */
-    if(*strParam != '"' || strParam[(strlen(strParam) - 1)] !='"') {
-        ERORR_MSG(("Parameter for %s must be enclosed in quotes\n", STRING_STR));
-        return FALSE;
-    }
-
-    return TRUE;
-}
 
 /*
  *get a string and return true if contains only alphanumeric chars otherwise return false

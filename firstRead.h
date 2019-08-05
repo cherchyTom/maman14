@@ -13,6 +13,7 @@
 #include "txtAnalyzer.h"
 #include "symbolList.h"
 #include "memoryWord.h"
+#include "labelsQueue.h"
 
 /*=========Data Structures======*/
 

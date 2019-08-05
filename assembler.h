@@ -28,6 +28,7 @@
 #define COMMA ','
 #define SPACE ' '
 #define COLON ':'
+#define QUOTE '"'
 #define OFFSET_START '['
 #define OFFSET_END ']'
 

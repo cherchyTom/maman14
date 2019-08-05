@@ -1,5 +1,10 @@
-/*
+/*This file manages the first input reading flow.
+ *Including: parsing lines, validate code text, adding symbols to list,
+ *          add labels for second read to queue, code memory words, merge code and data segments and update symbol tables values
  *
+ *Writen by:
+ *Tom Cherchy   302649397
+ *Avrahamii XXXXXXXX
  *
  */
 
@@ -147,7 +152,6 @@ static void macroParse(char* lineStr){
 
     /* macro is valid - add it to symbol table */
     addSymbol(createSymbol(macroLabel,MACRO,INVALID_INSTRUCTION,macroValue));
-    printf("----==== macro label is %s and value is %d ---========\n",macroLabel,getSymbolValue(macroLabel));
     return;
 }
 
@@ -258,29 +262,50 @@ static void parseDataParams(lineInfo*line){
 static void parseStringParams(lineInfo*line){
     char nextWord[MAX_LINE_LEN];
 
-    /*skip spaces and retrieve next parameter */
+    /* validate there is a parameter to parse*/
+    if(isEmptySTR(line->lineStr)){
+        ERORR_MSG(("There is no parameter on %s declaration - Expecting for exactly 1 parameter\n",STRING_STR));
+        return;
+    }
+    /*skip spaces */
     leftTrim(&line->lineStr);
-    getNextWordByDelimiter(nextWord,line->lineStr,SPACE,sizeof(nextWord));
 
-    /*remove spaces from end of parameter*/
-    rightTrim(nextWord);
+    /*validate string param start with quote*/
+    if(*line->lineStr != QUOTE){
+        ERORR_MSG(("Invalid parameter %s on %s declaration - Parameter must be enclosed by quotes\n",line->lineStr,STRING_STR));
+        return;
+    }
+    /* lineStr position after the first quote*/
+    line->lineStr++;
 
-    /*validate parameter format*/
-    if(!isLegalStringParam(nextWord)) {
+    /*retrieve next string parameter */
+    getNextWordByDelimiter(nextWord,line->lineStr,QUOTE,sizeof(nextWord));
+
+    /*validate no empty param */
+    if(isEmptySTR(nextWord)){
+        ERORR_MSG(("Invalid parameter \"\"  on %s declaration - Empty param was declared\n",STRING_STR));
         return;
     }
 
-    /* increase lineStr to point to the next position after parameter*/
+    /* set lineStr position after the parameter (on the postfix quote)*/
     line->lineStr += strlen(nextWord);
+
+    /*validate string param end with quote*/
+    if(*line->lineStr != QUOTE){
+        ERORR_MSG(("Invalid parameter %s  on %s declaration - Parameter must be enclosed by quotes\n",nextWord,STRING_STR));
+        return;
+    }
+    /* lineStr position after the first quote*/
+    line->lineStr++;
+
     /* validate there is no more parameter*/
     if(!isEmptySTR(line->lineStr)){
-        ERORR_MSG(("Invalid parameter \"%s\"  on %s declaration - Expecting for exactly 1 parameter\n",line->lineStr,STRING_STR));
+        ERORR_MSG(("Invalid parameter %s  on %s declaration - Expecting for exactly 1 parameter\n",line->lineStr,STRING_STR));
         return;
     }
     /* map string to memory word in case there is no error */
     if(!isError)
         addStringMemoryWord(nextWord);
-    printf("\n----=====String Instruction====-----\n");
     return;
 }
 
@@ -309,8 +334,9 @@ static void parseExtEntParams(lineInfo*line){
     /*In case of extern instruction add declared parameter to symbol list*/
     if(line->instStruct->type == EXTERN)
         addSymbol(createSymbol(nextWord,INSTRUCTION,EXTERN,EXTERN_DEFAULT_ADDRESS));
-
-    printf("\n----=====%s Instruction====-----\n",line->instStruct->string );
+    /* in case of entry add the declared param to label queue in order to handle on second read */
+    else
+        addLabelToQ(ENTRY_LABEL,nextWord,FALSE,DEFAULT_MEMORY_VALUE,currentLine);
     return;
 }
 
@@ -597,14 +623,20 @@ static void codeOperandToMemory(operandInfo *opInfo, boolean isSourceOp) {
 
     /*add LABEL / ARR operand */
 
-    /* check if label defined and update its address */
+    /* check if label defined, update its address and add it to label queue for second read */
     if(opInfo->isDefinedLabel) {
-        areType are = (isExternalSymbol(opInfo->label)) ? EXTENAL : RELOCATABLE; /*set are type*/
+        boolean isExternal = isExternalSymbol(opInfo->label);
+        areType are = (isExternal) ? EXTENAL : RELOCATABLE; /*set are type*/
+        /*add label to queue for second read */
+        addLabelToQ(OPERAND_LABEL,opInfo->label,TRUE,getIC(),currentLine);
+        /*code operand label to memory word */
         addAddressMemoryWord(are,opInfo->value);
     }
-    /* in case if undefined label insert an empty word */
+    /* in case if undefined label insert an empty word  to memory list*/
     else {
-        opInfo->address = getIC(); /*keep memory address to update on second run*/
+        /*add label to queue for second read */
+        addLabelToQ(OPERAND_LABEL,opInfo->label,FALSE,getIC(),currentLine);
+        /*add empty word to memory*/
         addAddressMemoryWord(DEFAULT_MEMORY_VALUE, DEFAULT_MEMORY_VALUE);
     }
     /* update offset word for array operand */
@@ -657,20 +689,19 @@ static void parseCommand (lineInfo *line) {
     }
 }
 
-/* Manage line parsing flow
+/* Manage line parsing flow:
+ * check for macro -> check for label -> check for instruction -> check for command
  *@Param pointer to lineInfo struct  */
 static void lineParse(lineInfo *line){
 
     /* check if line is a macro  and parse it*/
     if(isMacroStatement(line)){
-        printf("\n----=====MACRO====-----\n\n");
         macroParse(line->lineStr);
         return;
     }
 
     /* check if line contain valid label and parse it*/
     if(isContainValidLabel(line)){
-        printf("\n----=====LABEL====-----\n\n");
     }
     /* check if line is an instruction and parse it*/
     if(isInstruction(line)) {
