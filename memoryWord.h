@@ -106,10 +106,7 @@ void addDataMemoryWord(int param);
 /* get string param and code it to data memory words*/
 void addStringMemoryWord(char* param);
 
-/* update data memory word address by given offset */
-void updateDataSegmentByOffset(int offset);
-
-/* update data memory word address by given offset */
+/* update date memory word code address and concatenate it to the end of the code memory list */
 void mergeCodeAndDataSegments();
 
 /* clear memory word list */

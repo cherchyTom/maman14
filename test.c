@@ -8,18 +8,17 @@
 int main(int argc, char *argv[]){
     FILE *fd;
     char line[MAX_LINE_LEN+1];
-    int i;
 
 
 
-    if(argc<=1) {
+    if(argc < 2) {
         perror("Please run with at list one file name argument\n");
         return 1;
     }
 
     while (*(++argv)){
         fd = openFileRead(*argv);
-        i = firstRead(fd);
+        firstRead(fd);
         printf("\n................................print the original file:............................\n");
         rewind(fd);
         while (fgets(line, MAX_LINE_LEN+2, fd))

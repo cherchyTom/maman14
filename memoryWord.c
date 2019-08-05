@@ -16,23 +16,14 @@ static memoryWord *codeListTail;
 static memoryWord *dataListHead;
 static memoryWord *dataListTail;
 
+/* =======Functions ======*/
 
 int getDC(){
     return DC;
 }
 
-void increaseDC(){
-    DC++;
-    return;
-}
-
 int getIC(){
     return IC;
-}
-
-void increaseIC(){
-    IC++;
-    return;
 }
 
 void resetDC(){
@@ -158,7 +149,7 @@ void addStringMemoryWord(char* param){
 }
 
 /* update data memory word address by given offset */
-void updateDataSegmentByOffset(int offset){
+static void updateDataSegmentByOffset(int offset){
     memoryWord *tmp;
     /*empty list*/
     if(!dataListHead)
@@ -170,8 +161,10 @@ void updateDataSegmentByOffset(int offset){
 }
 
 
-/* update data memory word address by given offset */
+/* concatenate data memory list to end of the code memory list */
 void mergeCodeAndDataSegments(){
+    /*Update data words memory address by adding IC*/
+    updateDataSegmentByOffset(IC);
     /* empty code memory words list*/
     if(!codeListHead)
         codeListHead = codeListTail = dataListHead;

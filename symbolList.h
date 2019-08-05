@@ -21,12 +21,6 @@ typedef struct symbol_s {
 
 /* Function Prototypes */
 
-/* return current data counter */
-int getDC();
-
-/*Increase by one data counter (DC) */
-void increaseDC();
-
 /*@return symbol table list head */
 symbol* getSymbolListHead();
 
@@ -74,6 +68,11 @@ boolean isMacroExist(char* label);
 * @return symbol value
 */
 int getSymbolValue(char* label);
+
+/* update data/string symbol addresses by given offset
+ * @params - int offset - to increase address by
+ */
+void updateDataSymbolsByOffset(int offset);
 
 
 #endif //MAMAN14_SYMBOLLIST_H

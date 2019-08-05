@@ -1,18 +1,18 @@
-//
-// Created by ubuntu16 on 7/26/19.
-//
+/*
+ *
+ *
+ */
 
 #include "firstRead.h"
 
 /*==== global variables =====*/
 int currentLine = 0; /* represents the managed line number */
 boolean isError = FALSE; /*flag represent if a file read contains an error*/
-int IC = 0; /* Instruction counter*/
 
 /* Params parse function declaration  */
-void parseDataParams(lineInfo*line);
-void parseStringParams(lineInfo*line);
-void parseExtEntParams(lineInfo*line);
+static void parseDataParams(lineInfo*line);
+static void parseStringParams(lineInfo*line);
+static void parseExtEntParams(lineInfo*line);
 
 /* ====== Instructions List ====== */
 const instruction instructionArr[] =
@@ -60,7 +60,7 @@ static void resetOperand(operandInfo* operand){
 }
 
 /* initiate content of operand info struct */
-static void resetline(lineInfo* line) {
+static void resetLine(lineInfo* line) {
     line->address = 0;
     *line->originalString = '\0';
     line->lineStr = line->originalString; /* set line pointer to beginning of original string  */
@@ -184,7 +184,7 @@ static boolean isContainValidLabel(lineInfo *line){
 *@Param - pointer to flag if a comma where found before, the function validate its turned on and change it value depand on following comma
 *@Param - nextWord store the param*
 */
-boolean getNextParameter(lineInfo *line, boolean *isCommaFound, char *nextWord){
+static boolean getNextParameter(lineInfo *line, boolean *isCommaFound, char *nextWord){
 
     /* check for a comma between every two params except of the first one */
     if(!*isCommaFound) {
@@ -221,7 +221,7 @@ boolean getNextParameter(lineInfo *line, boolean *isCommaFound, char *nextWord){
 }
 
 /*Parse data instruction - check for validity, coding parameter into memory words and update symbol if exist  */
-void parseDataParams(lineInfo*line){
+static void parseDataParams(lineInfo*line){
 
     char nextWord[MAX_LINE_LEN];
     int parameterValue;
@@ -255,7 +255,7 @@ void parseDataParams(lineInfo*line){
 }
 
 /*Parse string instruction - check for validity, coding parameter into memory words and update symbol if exist  */
-void parseStringParams(lineInfo*line){
+static void parseStringParams(lineInfo*line){
     char nextWord[MAX_LINE_LEN];
 
     /*skip spaces and retrieve next parameter */
@@ -286,7 +286,7 @@ void parseStringParams(lineInfo*line){
 
 /* Parse extern/ entry params - check for validity and detect parameter
  * In case of extern add the parameter to the symbol list*/
-void parseExtEntParams(lineInfo*line){
+static void parseExtEntParams(lineInfo*line){
     char nextWord[MAX_LINE_LEN];
 
     /*skip white spaces and get label*/
@@ -317,7 +317,7 @@ void parseExtEntParams(lineInfo*line){
 /* handle instruction label
  * For data / string add label to symbol list
  * For entry / extern remove label and warn about it*/
-void parseInstructionLabel(lineInfo *line){
+static void parseInstructionLabel(lineInfo *line){
     /* If label does not exist */
     if (!line->isContainLabel)
         return;
@@ -333,7 +333,7 @@ void parseInstructionLabel(lineInfo *line){
 
 /* Parse Instruction type, check for parameter exist and  call related parse function
  * In case instruction does not exist set an error message */
-void parseInstruction (lineInfo *line) {
+static void parseInstruction (lineInfo *line) {
     char nextWord[MAX_LINE_LEN+1];
     /* set line type */
     line->lineType = INSTRUCTION;
@@ -655,11 +655,10 @@ static void parseCommand (lineInfo *line) {
     if(!isError){
         codeCommandToMemory(line);
     }
-
-
 }
 
-
+/* Manage line parsing flow
+ *@Param pointer to lineInfo struct  */
 static void lineParse(lineInfo *line){
 
     /* check if line is a macro  and parse it*/
@@ -681,14 +680,17 @@ static void lineParse(lineInfo *line){
 
     /*parse line as a command*/
     parseCommand(line);
-
     return;
 }
 
-int firstRead(FILE*fd){
+/* Manage first read flow:
+ * line parsing -> code validation -> create symbol list, memory word list and label list for second read
+ *@Param pointer to lineInfo struct  */
+void firstRead(FILE*fd){
     lineInfo line;
-    resetline(&line); /*initiate lineInfo struct */
+    resetLine(&line); /*initiate lineInfo struct */
 
+    /* read line, parse them and code instruction and command to memory words */
     while(readLine(fd,line.originalString,MAX_LINE_LEN)){
         currentLine++;
 
@@ -705,13 +707,18 @@ int firstRead(FILE*fd){
 
         /* Parse the current line */
         lineParse(&line);
-        resetline(&line); /*initiate lineInfo struct */
+        resetLine(&line); /*initiate lineInfo struct */
 
         printf("%s\n",line.originalString);
 
     }
+    /*In case of error finish here */
+    if(isError)
+        return;
 
-
-    return 0;
-
+    /*concatenate data memory list to code memory list*/
+    mergeCodeAndDataSegments();
+    /*update address of data/string labels in symbol list*/
+    updateDataSymbolsByOffset(getIC());
+    return;
 }

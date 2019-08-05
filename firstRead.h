@@ -31,26 +31,25 @@ typedef struct{
 
 /* Line */
 typedef struct{
-    int lineNumber;				/* line number in the file */
-    int address;				/* The address of the first word in the line */
-    char originalString[MAX_LINE_LEN +2];		/* Original line content */
-    char *lineStr;				/* pointer to the originalString - use to parse the line */
-    boolean isContainLabel;			/* A pointer to the lines label in labelArr */
-    char labelValue[MAX_LABEL_LEN+1]; /*contains label value if exist */
-    sentanceType lineType;       /* code, instruction or macro*/
-    const instruction *instStruct;   /* pointer to instruction struct - data, string, extern or entry */
-
-
-    char *commandStr;			/* The string of the command or instruction */
-
+    int address;				            /* The address of the first word in the line */
+    char originalString[MAX_LINE_LEN +2];	/* Original line content */
+    char *lineStr;				            /* pointer to the originalString - use to parse the line */
+    boolean isContainLabel;			        /* A pointer to the lines label in labelArr */
+    char labelValue[MAX_LABEL_LEN+1];       /*contains label value if exist */
+    sentanceType lineType;                  /* code, instruction or macro*/
+    const instruction *instStruct;          /* pointer to instruction struct - data, string, extern or entry */
     /* Command line */
-    const command *cmd;			/* A pointer to the command in g_cmdArr */
-    operandInfo targetOp;			/* The 1st operand */
-    operandInfo sourceOp;			/* The 2nd operand */
+    const command *cmd;			            /* A pointer to the command in command struct */
+    operandInfo targetOp;			        /* The 1st operand */
+    operandInfo sourceOp;			        /* The 2nd operand */
 
 } lineInfo;
 
 
 /*========Prototypes =====*/
-int firstRead(FILE*fd);
+
+/* Manage first read flow:
+ * line parsing -> code validation -> create symbol list, memory word list and label list for second read
+ *@Param pointer to lineInfo struct  */
+void firstRead(FILE*fd);
 #endif //MAMAN14_FIRSTREAD_H
