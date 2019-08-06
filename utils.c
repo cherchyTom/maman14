@@ -6,12 +6,19 @@ void validateMemoryAllocation(void* ptr, char* desc){
     }
 }
 
-FILE* openFileRead(char*fileName){
-    FILE *fd = fopen(fileName,"r");
-    if(!fd){
-        fprintf(stdout,"Failed to open file %s\n",fileName);
+FILE* openFile(char*fileName, char* filePostfix, char* mode){
+    FILE *fd;
+    char *fullFileName = (char*)malloc(strlen(fileName) + strlen(filePostfix) + 1); /*store full file name*/
+    validateMemoryAllocation(fullFileName,"when trying to open file to read\n");
+
+    /* concatenate file name and postfix */
+    sprintf(fullFileName, "%s%s", fileName, filePostfix);
+    if(!(fd = fopen(fullFileName,mode))){
+        fprintf(stdout,"Failed to open file %s\n",fullFileName);
+        free(fullFileName);
         exit(1);
     }
+    free(fullFileName);
     return fd;
 }
 

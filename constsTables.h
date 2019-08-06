@@ -9,46 +9,6 @@
 #include "assembler.h"
 //#include "firstRead.h"
 
-/*======= Data Structures=======*/
-
-/*
- * data structure of command including:
- * command name
- * command operation code
- * required parameters
- */
-typedef struct
-{
-    char *name;
-    unsigned int opcode : 4;
-    int numOfParams;
-} command;
-
-/*
- * data structure of register including:
- * register name
- * register code
- * required parameters
- */
-typedef struct
-{
-    char *name;
-    unsigned int code : 3;
-} rgstr;
-
-/*
- * data structure of instruction including:
- * instruction type
- * instruction string
- * params parse function
- */
-typedef struct
-{
-    instructionType type;
-    char *string;
-    void(*parseParamFunction)();
-} instruction;
-
 /* ====== Functions Prototypes====== */
 
 /*

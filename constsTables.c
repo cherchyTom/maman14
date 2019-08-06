@@ -40,8 +40,25 @@ const rgstr regArr[] =
                 { NULL } /* represent the end of the array */
         };
 
-/* ====== Instruction List Declaration ====== */
-extern const instruction instructionArr[];
+/*==== Extern functions declaration for instruction list ====== */
+/*parse data instruction params -  get lineInfo struct */
+extern void parseDataParams(lineInfo*line);
+/*parse string instruction params -  get lineInfo struct */
+extern void parseStringParams(lineInfo*line);
+/*parse extern / entry instruction params -  get lineInfo struct */
+extern void parseExtEntParams(lineInfo*line);
+
+/* ====== Instructions List ====== */
+const instruction instructionArr[] =
+        {	/* Instruction Type |Instruction String | Parse Instruction Function | Parse Param Function */
+                { DATA, DATA_STR, parseDataParams} ,
+                { STRING, STRING_STR, parseStringParams} ,
+                { EXTERN,EXTERN_STR, parseExtEntParams},
+                { ENTRY,ENTRY_STR, parseExtEntParams},
+                { INVALID_INSTRUCTION,NULL,NULL} /* represent the end of the array */
+        };
+
+
 
 /* ====== Functions ====== */
 

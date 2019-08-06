@@ -11,23 +11,8 @@
 #include "firstRead.h"
 
 /*==== global variables =====*/
-int currentLine = 0; /* represents the managed line number */
-boolean isError = FALSE; /*flag represent if a file read contains an error*/
-
-/* Params parse function declaration  */
-static void parseDataParams(lineInfo*line);
-static void parseStringParams(lineInfo*line);
-static void parseExtEntParams(lineInfo*line);
-
-/* ====== Instructions List ====== */
-const instruction instructionArr[] =
-        {	/* Instruction Type |Instruction String | Parse Instruction Function | Parse Param Function */
-                { DATA, DATA_STR, parseDataParams} ,
-                { STRING, STRING_STR, parseStringParams} ,
-                { EXTERN,EXTERN_STR, parseExtEntParams},
-                { ENTRY,ENTRY_STR, parseExtEntParams},
-                { INVALID_INSTRUCTION,NULL,NULL} /* represent the end of the array */
-        };
+static currentLine = 0; /* represents the managed line number */
+static isError = FALSE; /*flag represent if a file read contains an error*/
 
 
 /*====== MACROS ======== */
@@ -41,6 +26,28 @@ const instruction instructionArr[] =
 
 
 /*====== Functions ====== */
+
+/* return currentLine value */
+int getCurrentLine(){
+    return currentLine;
+}
+
+/* get int line number and set it to be currentLine value */
+void setCurrentLine(int lineNumeber){
+    currentLine = lineNumeber;
+    return;
+}
+
+/* return isError value */
+boolean getErrorStatus(){
+    return isError;
+}
+
+/* get boolean status and set it to be isError value */
+void setErrorStatus(boolean status){
+    isError = status;
+    return;
+}
 
 /* copy content of source operand info struct to destination operand info struct */
 static void operandCopy(operandInfo* dest, operandInfo* src){
@@ -225,7 +232,7 @@ static boolean getNextParameter(lineInfo *line, boolean *isCommaFound, char *nex
 }
 
 /*Parse data instruction - check for validity, coding parameter into memory words and update symbol if exist  */
-static void parseDataParams(lineInfo*line){
+void parseDataParams(lineInfo*line){
 
     char nextWord[MAX_LINE_LEN];
     int parameterValue;
@@ -259,7 +266,7 @@ static void parseDataParams(lineInfo*line){
 }
 
 /*Parse string instruction - check for validity, coding parameter into memory words and update symbol if exist  */
-static void parseStringParams(lineInfo*line){
+void parseStringParams(lineInfo*line){
     char nextWord[MAX_LINE_LEN];
 
     /* validate there is a parameter to parse*/
@@ -311,7 +318,7 @@ static void parseStringParams(lineInfo*line){
 
 /* Parse extern/ entry params - check for validity and detect parameter
  * In case of extern add the parameter to the symbol list*/
-static void parseExtEntParams(lineInfo*line){
+void parseExtEntParams(lineInfo*line){
     char nextWord[MAX_LINE_LEN];
 
     /*skip white spaces and get label*/
@@ -739,8 +746,6 @@ void firstRead(FILE*fd){
         /* Parse the current line */
         lineParse(&line);
         resetLine(&line); /*initiate lineInfo struct */
-
-        printf("%s\n",line.originalString);
 
     }
     /*In case of error finish here */
