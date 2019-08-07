@@ -28,6 +28,7 @@ static writeObjectFirstLine(FILE *fd){
  *Param - pointer to FILE, address of word, memory word (integer) */
 static writeObjectLine(FILE *fd, int address, int word){
     fprintf(fd,"%04d\t%s\n",address,intToSpecialBase(word));
+    fprintSpecialBaseNum(4,)
     return;
 }
 

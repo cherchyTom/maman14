@@ -46,9 +46,9 @@ boolean readLine(FILE *fd, char *buf, int maxLength){
     return TRUE;
 }
 
-/*get int num which is stored in numOfBits bits and print it in spacial base 4 format
+/*get int num which is stored in numOfBits bits and print it in spacial base 4 format in FILE fd
  * assumption - num of bits >= 2*/
-void fprintSpecialBaseNum(int num, int numOfBits){
+void fprintSpecialBaseNum(int num, int numOfBits, FILE *fd){
     unsigned long int mask = 3 ;/*init mask with format of 00..11 */
     char special4Base[numOfBits/2]; /* array to store new base chars */
     int i;
@@ -80,7 +80,7 @@ void fprintSpecialBaseNum(int num, int numOfBits){
 
     /*print array*/
     for(i=0; i<numOfBits/2; i++)
-        fputc(special4Base[i]);
+        fputc(special4Base[i],fd);
 
     return;
 }
