@@ -5,6 +5,9 @@
 #ifndef MAMAN14_ASSEMBLER_H
 #define MAMAN14_ASSEMBLER_H
 
+#include <stdio.h>
+
+
 /* Instruction strings */
 
 #define MACRO_STR ".define"

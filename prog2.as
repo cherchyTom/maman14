@@ -1,6 +1,4 @@
-;
- ;
-
+; file .as
 
 .entry  LIST
 

@@ -45,3 +45,42 @@ boolean readLine(FILE *fd, char *buf, int maxLength){
 
     return TRUE;
 }
+
+/*get int num which is stored in numOfBits bits and print it in spacial base 4 format
+ * assumption - num of bits >= 2*/
+void fprintSpecialBaseNum(int num, int numOfBits){
+    unsigned long int mask = 3 ;/*init mask with format of 00..11 */
+    char special4Base[numOfBits/2]; /* array to store new base chars */
+    int i;
+
+    /* convert each 2 bits from num to special char in the "quick conversion method"
+     * do it for numOfBits/2  pairs and store in the array in descending order*/
+    for(i= numOfBits/2 - 1; i>=0; i--, mask <<= 2){
+        switch (num&mask){
+            case 0: {
+                special4Base[i] = '*';
+                break;
+            }
+            case 1: {
+                special4Base[i] = '#';
+                break;
+            }
+            case 2: {
+                special4Base[i] = '%';
+                break;
+            }
+            case 3: {
+                special4Base[i] = '!';
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    /*print array*/
+    for(i=0; i<numOfBits/2; i++)
+        fputc(special4Base[i]);
+
+    return;
+}

@@ -166,27 +166,27 @@ static void macroParse(char* lineStr){
 /* Return true if line contains a label statement otherwise false
  * update line info(statement type & lineSTR) in case of macro
  * */
-static boolean isContainValidLabel(lineInfo *line){
+static void parseLabel(lineInfo *line){
     char nextWord[MAX_LINE_LEN+1];
     char *labelEnd = strchr(line->lineStr, ':');
 
     /*Label does not exist*/
     if(!labelEnd)
-        return FALSE;
+        return;
     /*skip spaces and retrieve label name */
     leftTrim(&line->lineStr);
     getNextWordByDelimiter(nextWord,line->lineStr,COLON,sizeof(nextWord));
 
     /* check for label name validity */
     if(!isValidLabel(nextWord)){
-        return FALSE;
+        return;
     }
 
     /* update line info with label value and new line str position*/
     line->isContainLabel = TRUE;
     strcpy(line->labelValue,nextWord);
     line->lineStr = labelEnd+1;
-    return TRUE;
+    return;
 }
 
 /* get next parameter (or operand) from a string with parameters which are separated by comma
@@ -708,8 +708,7 @@ static void lineParse(lineInfo *line){
     }
 
     /* check if line contain valid label and parse it*/
-    if(isContainValidLabel(line)){
-    }
+    parseLabel(line);
     /* check if line is an instruction and parse it*/
     if(isInstruction(line)) {
         parseInstruction(line);

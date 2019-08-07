@@ -42,3 +42,7 @@ FILE* openFile(char*fileName,char* filePostfix,char* mode);
  * return false if read failed, otherwise false
  */
 boolean readLine(FILE *fd, char *buf, int maxLength);
+
+/*get int num which is stored in numOfBits bits and print it in spacial base 4 format
+ * assumption - num of bits >= 2*/
+void printSpecialBaseNum(int num, int numOfBits)

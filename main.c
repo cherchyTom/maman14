@@ -52,6 +52,10 @@ void parseFile(char*fileName){
     secondRead(obFd,extFd,entFd);
 
     /*delete files in case of error / delete empty files*/
+    fclose(obFd);
+    fclose(entFd);
+    fclose(extFd);
+
     /* reset */
 
     return;

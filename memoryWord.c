@@ -7,7 +7,7 @@
 /* =======Global Variables ======*/
 
 /* instruction and data counter*/
-static IC = FIRST_ADDRESS;
+static IC = 0;
 static DC = 0;
 
 /*pointers to symbol list head and tail*/
@@ -17,6 +17,15 @@ static memoryWord *dataListHead;
 static memoryWord *dataListTail;
 
 /* =======Functions ======*/
+
+/* return current data counter */
+memoryWord* getCodeTail(){
+    return codeListTail;
+}
+/* return current data counter */
+memoryWord* getDatahead(){
+    return codeListTail;
+}
 
 int getDC(){
     return DC;
@@ -31,7 +40,7 @@ void resetDC(){
     return;
 }
 void resetIC(){
-    IC = FIRST_ADDRESS;
+    IC = 0;
     return;
 }
 
@@ -61,9 +70,9 @@ memoryWord* createMemoryWord(segmentType segType){
 
     /*add memory word to relevant list and increase its counter*/
     if(segType == CODE_SEGMENT)
-        addToMemoryList(&codeListHead,&codeListTail,newMW,IC++);
+        addToMemoryList(&codeListHead,&codeListTail,newMW,FIRST_ADDRESS + IC++);
     else if (segType == DATA_SEGMENT)
-        addToMemoryList(&dataListHead,&dataListTail,newMW,DC++);
+        addToMemoryList(&dataListHead,&dataListTail,newMW,FIRST_ADDRESS + DC++);
     else {
         ERORR_MSG(("Invalid Memory Type - Cannot handle\n"));
     }
@@ -144,6 +153,8 @@ void addStringMemoryWord(char* param){
         addDataMemoryWord((int) (*param));
         param++;
     }
+    /* add zero for end of string */
+    addDataMemoryWord(0);
     return;
 }
 

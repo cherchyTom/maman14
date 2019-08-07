@@ -62,6 +62,11 @@ typedef struct memoryWord_s/* 14 bits */
 /* Function Prototypes */
 
 /* return current data counter */
+memoryWord* getCodeTail();
+/* return current data counter */
+memoryWord* getDatahead();
+
+/* return current data counter */
 int getDC();
 
 /*Increase by one data counter (DC) */

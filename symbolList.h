@@ -69,6 +69,11 @@ boolean isMacroExist(char* label);
 */
 int getSymbolValue(char* label);
 
+/* search for symbol and retrieve its fields.
+ * get symbol label (name) to search and pointers to value and symbol type to retrieve  the parameters into
+ */
+boolean getSymbolValues(char* label, int *value, sentanceType *symbolType);
+
 /* update data/string symbol addresses by given offset
  * @params - int offset - to increase address by
  */

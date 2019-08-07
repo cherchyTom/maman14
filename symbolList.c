@@ -81,6 +81,21 @@ int getSymbolValue(char* label){
     return symbol->value;
 }
 
+/* search for symbol and retrieve its fields.
+ * get symbol label (name) to search and pointers to value and symbol type to retrieve  the parameters into
+ */
+boolean getSymbolValues(char* label, int *value, sentanceType *symbolType){
+    symbol* symbol= searchSymbolByLabel(label);
+    /*symbol does not exist*/
+    if(!symbol){
+        return FALSE;
+    }
+    /*if label is found set its params */
+    *value = symbol->value;
+    *symbolType = symbol->symbolType;
+    return TRUE;
+}
+
 boolean isExternalSymbol(char* label){
     symbol* symbol= searchSymbolByLabel(label);
     if(!symbol){
