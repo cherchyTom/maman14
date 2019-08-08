@@ -57,7 +57,7 @@ void getNextLabelParams(qLabelType *type, char* label,boolean *isDefined, int *a
     return;
 }
 
-/*remove fisrt label from labels queue */
+/*remove first label from labels queue */
 void removeLabelFromQ(){
     qLabel* labelToDelete;
     /*empty queue */
@@ -70,7 +70,7 @@ void removeLabelFromQ(){
     return;
 }
 
-/*remove fisrt label from labels queue */
+/*return true if queue label is empty otherwise false */
 boolean isEmptyQ(){
     return(!queueHead) ? TRUE : FALSE;
 }

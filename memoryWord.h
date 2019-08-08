@@ -27,7 +27,7 @@ typedef struct memoryWord_s/* 14 bits */
             unsigned int dest : 2;        /* Destination op addressing method code */
             unsigned int src : 2;        /* Source op addressing method code */
             unsigned int opcode : 4;    /* Command code */
-            unsigned int  : 4;            /* Unused Bit */
+            unsigned int unused: 4;            /* Unused Bit */
         } firstCmd;
 
         /* immediate addressing operand value */
@@ -47,7 +47,7 @@ typedef struct memoryWord_s/* 14 bits */
             unsigned int are : 2;       /* are type */
             unsigned int dest : 3;      /* Source register code */
             unsigned int src : 3;       /* Destination register code */
-            unsigned int : 6;            /* Unused Bit */
+            unsigned int unused: 6;            /* Unused Bit */
         } reg;
 
         /* data  */
@@ -60,11 +60,6 @@ typedef struct memoryWord_s/* 14 bits */
 
 
 /* Function Prototypes */
-
-/* return current data counter */
-memoryWord* getCodeTail();
-/* return current data counter */
-memoryWord* getDatahead();
 
 /* return current data counter */
 int getDC();
@@ -113,6 +108,20 @@ void addStringMemoryWord(char* param);
 
 /* update date memory word code address and concatenate it to the end of the code memory list */
 void mergeCodeAndDataSegments();
+
+/*get params from first memory word in list
+/* Params - pointers to variables to save struct fields*/
+void getNextWordParams(int *address, int *word);
+
+/* get address memory word params and set them on the first memory word
+ * @params - are code, value (operand address) */
+void updateAddressMemoryWord(areType are, int value);
+
+/*remove first memory word record from memory word list*/
+void removeFirstMemoryWord();
+
+/*return true if code list is empty otherwise false */
+boolean isEmptyCodeListQ();
 
 /* clear memory word list */
 void ClearMemoryWordList ();

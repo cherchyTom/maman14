@@ -43,6 +43,6 @@ FILE* openFile(char*fileName,char* filePostfix,char* mode);
  */
 boolean readLine(FILE *fd, char *buf, int maxLength);
 
-/*get int num which is stored in numOfBits bits and print it in spacial base 4 format
- * assumption - num of bits >= 2*/
-void fprintSpecialBaseNum(int num, int numOfBits, FILE *fd);
+/*get int num which is stored in numOfBits bits and return it in spacial base 4 format as a string, stored in input char*param
+ *assumption - num of bits >= 2*/
+void intToSpecial4Base(int num, int numOfBits, char* specialBaseNum);

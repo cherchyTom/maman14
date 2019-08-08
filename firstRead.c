@@ -350,17 +350,21 @@ void parseExtEntParams(lineInfo*line){
 /* handle instruction label
  * For data / string add label to symbol list
  * For entry / extern remove label and warn about it*/
-static void parseInstructionLabel(lineInfo *line){
+static void AddLabelToSymbolList(lineInfo *line){
     /* If label does not exist */
     if (!line->isContainLabel)
         return;
-    /*in case of data or string instruction add label to symbol list*/
-    if(line->instStruct->type == DATA || line->instStruct->type == STRING)
-        addSymbol(createSymbol(line->labelValue, INSTRUCTION, line->instStruct->type, getDC()));
-    else
-    /* In case of entry or extern instruction remove label and warn about it*/
-    LABEL_WARNING(line)
 
+    /*in case of instruction */
+    if(line->lineType == INSTRUCTION) {
+        /*in case of data or string instruction add label to symbol list*/
+        if (line->instStruct->type == DATA || line->instStruct->type == STRING)
+            addSymbol(createSymbol(line->labelValue, INSTRUCTION, line->instStruct->type, getDC()+ FIRST_ADDRESS));
+        else
+            /* In case of entry or extern instruction remove label and warn about it*/
+        LABEL_WARNING(line)
+    }else /* CODE (command) */
+        addSymbol(createSymbol(line->labelValue, CODE, INVALID_INSTRUCTION, getIC()+ FIRST_ADDRESS));
     return;
 }
 
@@ -384,8 +388,8 @@ static void parseInstruction (lineInfo *line) {
     /*set lineStr position  */
     line->lineStr += strlen(line->instStruct->string);
 
-    /*parse instruction line label*/
-    parseInstructionLabel(line);
+    /*add instruction line label to symbol list*/
+    AddLabelToSymbolList(line);
 
     /*call to related parse function*/
     line->instStruct->parseParamFunction(line);
@@ -635,14 +639,14 @@ static void codeOperandToMemory(operandInfo *opInfo, boolean isSourceOp) {
         boolean isExternal = isExternalSymbol(opInfo->label);
         areType are = (isExternal) ? EXTENAL : RELOCATABLE; /*set are type*/
         /*add label to queue for second read */
-        addLabelToQ(OPERAND_LABEL,opInfo->label,TRUE,getIC(),currentLine);
+        addLabelToQ(OPERAND_LABEL,opInfo->label,TRUE,getIC() + FIRST_ADDRESS,currentLine);
         /*code operand label to memory word */
         addAddressMemoryWord(are,opInfo->value);
     }
     /* in case if undefined label insert an empty word  to memory list*/
     else {
         /*add label to queue for second read */
-        addLabelToQ(OPERAND_LABEL,opInfo->label,FALSE,getIC(),currentLine);
+        addLabelToQ(OPERAND_LABEL,opInfo->label,FALSE,getIC() + FIRST_ADDRESS,currentLine);
         /*add empty word to memory*/
         addAddressMemoryWord(DEFAULT_MEMORY_VALUE, DEFAULT_MEMORY_VALUE);
     }
@@ -687,6 +691,8 @@ static void parseCommand (lineInfo *line) {
     /*validate command name*/
     if(!isValidCommandName(line))
         return;
+    /*add command label to symbol list*/
+    AddLabelToSymbolList(line);
     /*parse operands*/
     parseOperands(line);
 
@@ -694,6 +700,7 @@ static void parseCommand (lineInfo *line) {
     if(!isError){
         codeCommandToMemory(line);
     }
+
 }
 
 /* Manage line parsing flow:
@@ -722,7 +729,7 @@ static void lineParse(lineInfo *line){
 
 /* Manage first read flow:
  * line parsing -> code validation -> create symbol list, memory word list and label list for second read
- *@Param pointer to lineInfo struct  */
+ *@Param pointer to assembly file to parse */
 void firstRead(FILE*fd){
     lineInfo line;
     resetLine(&line); /*initiate lineInfo struct */

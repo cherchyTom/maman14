@@ -24,7 +24,7 @@ memoryWord* getCodeTail(){
 }
 /* return current data counter */
 memoryWord* getDatahead(){
-    return codeListTail;
+    return dataListHead;
 }
 
 int getDC(){
@@ -91,6 +91,7 @@ void addFirstCodeMemoryWord(int dest, int src,int opcode){
     firstCodeWord->word.firstCmd.dest = dest;
     firstCodeWord->word.firstCmd.src = src;
     firstCodeWord->word.firstCmd.opcode = opcode;
+    firstCodeWord->word.firstCmd.unused = DEFAULT_MEMORY_VALUE;
     return;
 }
 
@@ -132,6 +133,7 @@ void addRegisterMemoryWord(int dest, int src){
     reg->word.reg.are = ABSOLUTE;
     reg->word.reg.dest = dest;
     reg->word.reg.src = src;
+    reg->word.reg.unused = 0;
     return;
 }
 
@@ -183,6 +185,49 @@ void mergeCodeAndDataSegments(){
         codeListTail->nextWord = dataListHead;
 
     return;
+}
+
+/*get params from first memory word in list
+/* Params - pointers to variables to save struct fields*/
+void getNextWordParams(int *address, int *word){
+    /*empty list */
+    if(!codeListHead){
+        return;
+    }
+    *address = codeListHead->address;
+    *word = codeListHead->word.value; /* word.value represents the int value of all the 14 bits of the word union struct */
+    return;
+}
+
+/* get address memory word params and set them on the first memory word
+ * @params - are code, value (operand address) */
+void updateAddressMemoryWord(areType are, int value){
+    /*empty queue */
+    if(!codeListHead){
+        return;
+    }
+    /*set bits values*/
+    codeListHead->word.operandAddress.are = are;
+    codeListHead->word.operandAddress.value = value;
+    return;
+}
+
+/*remove first memory word record from memory word list*/
+void removeFirstMemoryWord(){
+    memoryWord* wordToDelete;
+    /*empty queue */
+    if(!codeListHead){
+        return;
+    }
+    wordToDelete = codeListHead;
+    codeListHead = codeListHead->nextWord;
+    free(wordToDelete);
+    return;
+}
+
+/*return true if code list is empty otherwise false */
+boolean isEmptyCodeListQ(){
+    return(!codeListHead) ? TRUE : FALSE;
 }
 
 

@@ -84,7 +84,7 @@ int getSymbolValue(char* label){
 /* search for symbol and retrieve its fields.
  * get symbol label (name) to search and pointers to value and symbol type to retrieve  the parameters into
  */
-boolean getSymbolValues(char* label, int *value, sentanceType *symbolType){
+boolean getSymbolValues(char* label, int *value, sentanceType *symbolType,instructionType *instType){
     symbol* symbol= searchSymbolByLabel(label);
     /*symbol does not exist*/
     if(!symbol){
@@ -93,6 +93,7 @@ boolean getSymbolValues(char* label, int *value, sentanceType *symbolType){
     /*if label is found set its params */
     *value = symbol->value;
     *symbolType = symbol->symbolType;
+    *instType = symbol->instType;
     return TRUE;
 }
 
@@ -120,7 +121,7 @@ void updateDataSymbolsByOffset(int offset){
     /*update data/string symbols*/
     for(tmp = listHead; tmp != NULL; tmp = tmp->next)
         if(tmp->instType == DATA || tmp->instType == STRING)
-            tmp->value += offset;
+            tmp->value += (offset);
     return;
 }
 
