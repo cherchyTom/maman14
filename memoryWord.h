@@ -124,6 +124,6 @@ void removeFirstMemoryWord();
 boolean isEmptyCodeListQ();
 
 /* clear memory word list */
-void ClearMemoryWordList ();
+void clearMemoryWordList();
 
 #endif //MAMAN14_MEMORYWORD_H

@@ -14,32 +14,56 @@
 #include "firstRead.h"
 #include "secondRead.h"
 
+/*====external functions declarations======= */
+/* reset memory word module */
+extern void clearMemoryWordList();
+/*reset labelsQueue  module */
+extern void clearLabelsQ();
+/*reset symblol table module */
+extern void clearSymbolTable();
+
+
+/*=======Functions=======*/
+
 /*create output files
  * get char* fileName and pointers to FILE* for each file - object, entry and extern*/
-void createOutPutFiles(char* fileName,FILE **obFd, FILE **extFd, FILE **entFd){
+static void createOutputFiles(char* fileName,FILE **obFd, FILE **extFd, FILE **entFd){
     /*create object, entry and extern files */
-    *obFd = openFile(fileName,OBJ_POSTFIX,"w");
-    *extFd = openFile(fileName,EXT_POSTFIX,"w");
-    *entFd = openFile(fileName,ENT_POSTFIX,"w");
+    *obFd = openFile(fileName,OBJ_POSTFIX,"w+");
+    *extFd = openFile(fileName,EXT_POSTFIX,"w+");
+    *entFd = openFile(fileName,ENT_POSTFIX,"w+");
     return;
+}
+
+/*close output files / delete in cases of error or empty files
+ *get char* fileName and FILE pointers for each file - object, entry and extern*/
+static void closeFiles(char* fileName, FILE *obFd, FILE *extFd, FILE *entFd){
+    /*create object, entry and extern files */
+    closeOutputFile(fileName,OBJ_POSTFIX,obFd);
+    closeOutputFile(fileName,EXT_POSTFIX,extFd);
+    closeOutputFile(fileName,ENT_POSTFIX,entFd);
+    return;
+}
+
+/*reset assembler modules, free memory and init globals*/
+static void resetAssembler(){
+    clearSymbolTable(); /* reset symbol table */
+    clearLabelsQ(); /* reset labels queue */
+    clearMemoryWordList(); /* reset memoryWord list */
+    setErrorStatus(FALSE); /* initiate error flag to false */
+    setCurrentLine(0); /* initiate currentLine counter to 0 */
 }
 
 /*Manage line parsing flow
  * get char* fileName to parse*/
 void parseFile(char*fileName){
     FILE *asFd, *obFd, *entFd , *extFd;
-    char line[MAX_LINE_LEN+1]; /*TO DELETE */
 
     /*open assembly file */
     asFd = openFile(fileName,ASSEMBLY_POSTFIX,"r");
     /*send assembly file to first read processing*/
     printf("Start processing \"%s%s\" file.\n",fileName,ASSEMBLY_POSTFIX);
     firstRead(asFd);
-
-    printf("\n................................print the original file:............................\n"); /*TO DELETE */
-    rewind(asFd); /*TO DELETE */
-    while (fgets(line, MAX_LINE_LEN+2, asFd))/*TO DELETE */
-        printf("%s", line);/*TO DELETE */
     fclose(asFd);
 
     /*In case of error finish here*/
@@ -48,22 +72,21 @@ void parseFile(char*fileName){
         return;
     }
 
-    createOutPutFiles(fileName, &obFd, &entFd, &extFd);
+    /*create output files and run second read */
+    createOutputFiles(fileName, &obFd, &entFd, &extFd);
     secondRead(obFd,extFd,entFd);
 
-    /*delete files in case of error / delete empty files*/
-    fclose(obFd);
-    fclose(entFd);
-    fclose(extFd);
+    /* close (& delete empty ) output files */
+    closeFiles(fileName,obFd,extFd,entFd);
+    printf("Finish processing \"%s%s\" file %s.\n",fileName,ASSEMBLY_POSTFIX,(getErrorStatus()? "with errors" : "successfully"));
 
-    /* reset */
-
+    /* reset assembler module*/
+    resetAssembler();
     return;
 }
 
 
 int main(int argc, char *argv[]){
-
 
     /* check for valid argument amount */
     if(argc < 2) {

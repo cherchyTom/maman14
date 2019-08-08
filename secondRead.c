@@ -21,9 +21,9 @@ static writeObjectFirstLine(FILE *fd){
 
 /*write memory address and  memory word, in special base, in output object file.
  *Param - pointer to FILE, address of word, memory word (integer) */
-static writeObjectLine(FILE *fd, int address, int word){
+static writeObjectLine(FILE *fd, int address, int wordValue){
     char specialBaseNum[MEMORY_WORD_BITS/2 +1]; /* set enough memory to store 4 based memory word + end of string sign */
-    intToSpecial4Base(word,MEMORY_WORD_BITS,specialBaseNum); /*convert int to spacial base string*/
+    intToSpecial4Base(wordValue,MEMORY_WORD_BITS,specialBaseNum); /*convert int to spacial base string*/
     fprintf(fd,"%04d\t%s\n",address,specialBaseNum);
     return;
 }
@@ -116,8 +116,6 @@ void secondRead(FILE *obFd, FILE *entFd, FILE *extFd){
     while(!isEmptyQ()){
         /*get next label params*/
         getNextLabelParams(&type,label,&isDefined, &labelAddress, &lineNumber);
-        printf("Label params - type: %u, label: %s isDef: %d, address: %d lineNumber: %d\n", type,label , isDefined, labelAddress,lineNumber );
-
         /*set currentLine (the line in the original file that is actually proceed in the second run*/
         setCurrentLine(lineNumber);
 

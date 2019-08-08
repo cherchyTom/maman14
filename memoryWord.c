@@ -50,7 +50,8 @@ static void addToMemoryList(memoryWord **listHead,memoryWord **listTail, memoryW
     newWord->address = address; /* set address */
     /* empty list */
     if(!listHead || !*listHead){
-        *listHead = *listTail = newWord;
+        *listHead = newWord;
+        *listTail = newWord;
     }
 
     /*list is not empty */
@@ -63,7 +64,7 @@ memoryWord* createMemoryWord(segmentType segType){
     memoryWord *newMW = (memoryWord*)malloc(sizeof(memoryWord));
     validateMemoryAllocation(newMW,"when creating new memory word record\n");
     /*validate memory size */
-    if(!(IC+DC < MAX_MEMORY_WORDS)){
+    if((IC+DC >= MAX_MEMORY_WORDS)){
         ERORR_MSG(("Too Many instructions - memory is limited to %d words\n",MAX_MEMORY_WORDS));
         return NULL;
     }
@@ -230,9 +231,8 @@ boolean isEmptyCodeListQ(){
     return(!codeListHead) ? TRUE : FALSE;
 }
 
-
 /* clear memory word list */
-void ClearMemoryWordList (){
+void clearMemoryWordList(){
     memoryWord* wordToDelete;
     /*initiate IC & DC*/
     resetIC();
@@ -244,7 +244,10 @@ void ClearMemoryWordList (){
         free(wordToDelete);
     }
     /*initiate pointers to code and data memory lists*/
-    codeListHead = codeListTail = dataListHead = dataListTail = NULL;
+    //codeListHead = codeListTail = dataListHead = dataListTail = NULL;
+    codeListHead=NULL;
+    dataListHead = NULL;
+
     return;
 }
 

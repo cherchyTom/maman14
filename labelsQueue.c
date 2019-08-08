@@ -76,7 +76,7 @@ boolean isEmptyQ(){
 }
 
 /*delete lablesQ records and initiate global parameters */
-void ClearLablesQ (){
+void clearLabelsQ(){
     qLabel *labelToDelete;
     /*free table memory*/
     while (queueHead){

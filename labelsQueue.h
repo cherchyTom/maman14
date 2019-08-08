@@ -45,6 +45,6 @@ void removeLabelFromQ();
 boolean isEmptyQ();
 
 /*delete labelsQ records and initiate global parameters */
-void ClearLablesQ ();
+void clearLabelsQ();
 
 #endif //MAMAN14_LABELSQUEUE_H

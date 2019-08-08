@@ -1,6 +1,10 @@
-//
-// Created by ubuntu16 on 7/20/19.
-//
+/*This is a header file of utils.c
+ *
+ *Writen by:
+ *Tom Cherchy   302649397
+ *Avrahamii XXXXXXXX
+ *
+ */
 
 #ifndef MAMAN14_UTILS_H
 #define MAMAN14_UTILS_H
@@ -28,7 +32,8 @@ extern void setErrorStatus(boolean status);
  */
 
 /*=======Function prototypes=======*/
-
+/*check if a pointer has a null value and retun error - for using after dynamic memory allocation
+ * Params - void pointer *ptr and constant string for error massage*/
 void validateMemoryAllocation(void* ptr, char* desc);
 #endif //MAMAN14_UTILS_H
 
@@ -42,6 +47,14 @@ FILE* openFile(char*fileName,char* filePostfix,char* mode);
  * return false if read failed, otherwise false
  */
 boolean readLine(FILE *fd, char *buf, int maxLength);
+
+/* get pointer to FILE and return true if it is empty, otherwise false */
+boolean isEmptyFile(FILE *fd);
+
+/*close a given file. in case the file is empty or assembler detected and error, it is deleted.
+ * Params- fileName, file postfix and FILE pointer to the open file.
+ */
+void closeOutputFile(char*fileName, char* filePostfix, FILE* fd);
 
 /*get int num which is stored in numOfBits bits and return it in spacial base 4 format as a string, stored in input char*param
  *assumption - num of bits >= 2*/

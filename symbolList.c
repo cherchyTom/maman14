@@ -47,17 +47,6 @@ void addSymbol(symbol* newSymbol){
     return;
 }
 
-void ClearSymbolTable (){
-    symbol* symbol1ToDelete;
-    /*free table memory*/
-    while (listHead){
-        symbol1ToDelete = listHead;
-        listHead = listHead->next;
-        free(symbol1ToDelete);
-    }
-    listHead = listTail = NULL;
-}
-
 symbol* searchSymbolByLabel(char* label){
     symbol* symbol1ToCheck = listHead;
 
@@ -123,5 +112,16 @@ void updateDataSymbolsByOffset(int offset){
         if(tmp->instType == DATA || tmp->instType == STRING)
             tmp->value += (offset);
     return;
+}
+
+void clearSymbolTable(){
+    symbol* symbol1ToDelete;
+    /*free table memory*/
+    while (listHead){
+        symbol1ToDelete = listHead;
+        listHead = listHead->next;
+        free(symbol1ToDelete);
+    }
+    listHead = listTail = NULL;
 }
 

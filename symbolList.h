@@ -40,11 +40,6 @@ symbol* createSymbol(char *label,sentanceType symbolType,instructionType instTyp
 */
 void addSymbol(symbol* newSymbol);
 
-/* clear symbol table at the end of the usage or before reuse
- * init DC and delete table records
-*/
-void ClearSymbolTable();
-
 /* search symbol in table by label
 * @params - symbol label
 * @return pointer to founded symbol or NULL in case it was not found
@@ -78,6 +73,11 @@ boolean getSymbolValues(char* label, int *value, sentanceType *symbolType, instr
  * @params - int offset - to increase address by
  */
 void updateDataSymbolsByOffset(int offset);
+
+/* clear symbol table at the end of the usage or before reuse
+ * init DC and delete table records
+*/
+void clearSymbolTable();
 
 
 #endif //MAMAN14_SYMBOLLIST_H
