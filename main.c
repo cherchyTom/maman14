@@ -19,7 +19,7 @@
 extern void clearMemoryWordList();
 /*reset labelsQueue  module */
 extern void clearLabelsQ();
-/*reset symblol table module */
+/*reset symbol table module */
 extern void clearSymbolTable();
 
 
@@ -73,19 +73,20 @@ void parseFile(char*fileName){
     }
 
     /*create output files and run second read */
-    createOutputFiles(fileName, &obFd, &entFd, &extFd);
+    createOutputFiles(fileName, &obFd,&extFd, &entFd);
     secondRead(obFd,extFd,entFd);
 
     /* close (& delete empty ) output files */
     closeFiles(fileName,obFd,extFd,entFd);
-    printf("Finish processing \"%s%s\" file %s.\n",fileName,ASSEMBLY_POSTFIX,(getErrorStatus()? "with errors" : "successfully"));
+    printf("Finish processing \"%s%s\" file %s.\n\n",fileName,ASSEMBLY_POSTFIX,(getErrorStatus()? "with errors" : "successfully"));
 
     /* reset assembler module*/
     resetAssembler();
     return;
 }
 
-
+/*Main Program function - read file names from command line and send then to parsing.
+ *Params - command line arguments*/
 int main(int argc, char *argv[]){
 
     /* check for valid argument amount */

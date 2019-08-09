@@ -1,6 +1,11 @@
-//
-// Created by ubuntu16 on 8/1/19.
-//
+/*This is a header file of memoryWord.c
+ * Contains memoryWord data structures and prototypes
+ *
+ *Writen by:
+ *Tom Cherchy   302649397
+ *Avrahamii XXXXXXXX
+ *
+ */
 
 #ifndef MAMAN14_MEMORYWORD_H
 #define MAMAN14_MEMORYWORD_H
@@ -64,24 +69,14 @@ typedef struct memoryWord_s/* 14 bits */
 /* return current data counter */
 int getDC();
 
-/*Increase by one data counter (DC) */
-void increaseDC();
-
 /* return current code counter */
 int getIC();
-
-/*Increase by one data counter (IC) */
-void increaseIC();
 
 /*initiate DC */
 void resetDC();
 
 /*initiate IC */
 void resetIC();
-
-
-/* create memory word record set it in list and return a pointer to it */
-memoryWord* createMemoryWord(segmentType segType);
 
 /* get first code memory params and add it to code memory list
  * @params - are code, dest & src operands addressing code, operation code */

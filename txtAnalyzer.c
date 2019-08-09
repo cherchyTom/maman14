@@ -1,10 +1,15 @@
-//
-// Created by ubuntu16 on 7/25/19.
-//
+/*This file contains string manipulation functions, which are in used in different parts of the program.
+ *
+ *Writen by:
+ *Tom Cherchy   302649397
+ *Avrahamii XXXXXXXX
+ *
+ */
 
 #include "txtAnalyzer.h"
 
-/* Removes white spaces from the beginning of a string */
+/* Removes white spaces from the beginning of a string
+ * get pointer to string to adjust (char*) */
 void leftTrim(char **str){
     /*empty string*/
     if (!*str || !**str)
@@ -15,7 +20,8 @@ void leftTrim(char **str){
         (*str)++;
 }
 
-/* Removes white spaces from the end of a string */
+/* Removes white spaces from the end of a string
+ * get pointer to string to adjust (char*) */
 void rightTrim(char *str){
     char *eos;
     /*empty string*/
@@ -127,7 +133,7 @@ boolean isLegalNum(char *numStr, int numOfBits, int *numInt, int isSigned){
 /*
  *get a string and return true if contains only alphanumeric chars otherwise return false
  */
-static boolean isalnumSTR(char* str){
+boolean isalnumSTR(char* str){
     /*empty string*/
     if(!str)
         return FALSE;
@@ -143,39 +149,4 @@ static boolean isalnumSTR(char* str){
     return TRUE;
 }
 
-boolean isValidLabel(char* label){
 
-    /*is empty label*/
-    if(!label){
-        ERORR_MSG(("Empty Label is defined\n"));
-        return FALSE;
-    }
-
-    /* check for first letter*/
-    if(!isalpha(*label)){
-        ERORR_MSG(("Label must start with a letter\n"));
-        return FALSE;
-    }
-
-    /* check for alphanumeric chars*/
-    if(!isalnumSTR(label)){
-        ERORR_MSG(("Label must contains only alphanumeric chars\n"));
-        return FALSE;
-    }
-
-    /* check for valid length*/
-    if(strlen(label)> MAX_LABEL_LEN ){
-        ERORR_MSG(("Label must contains maximum %d chars\n",MAX_LABEL_LEN -1));
-        return FALSE;
-    }
-
-    /* check for reserved word*/
-    if(isReservedWord(label)){
-        ERORR_MSG(("Label %s is define as a reserved word\n",label));
-        return FALSE;
-    }
-
-    /* passed all validations */
-    return TRUE;
-
-}

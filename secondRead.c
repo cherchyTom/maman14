@@ -42,7 +42,7 @@ static void writeEntExtLine(FILE *fd, char*label, int value){
  *Param - pointer to label name, and pointer to address and type for getting the values into */
 static boolean getLabelParams(char* label, int *address,sentanceType *symbolType,instructionType *instType){
     /* validate label exists in symbol table and get symbol params*/
-    if(!getSymbolValues(label,address,symbolType,instType)){
+    if(!getSymbolParams(label,address,symbolType,instType)){
         ERORR_MSG(("Label \"%s\" is not defined.\n",label));
         return FALSE;
     }
@@ -102,7 +102,7 @@ static void operandLabelHandler(FILE *obFd,FILE *extFd, char*label,boolean *isDe
  * scanning labels in labelsQueue for second processing + scan memoryWord list (in parallel)
  * write the object, extern and entry files
  *@Params - pointers object, entry and extern files to write into*/
-void secondRead(FILE *obFd, FILE *entFd, FILE *extFd){
+void secondRead(FILE *obFd, FILE *extFd,FILE *entFd){
     /* variables to save qlabel and memory word structs fields */
     qLabelType type;
     char label[MAX_LABEL_LEN];

@@ -7,6 +7,7 @@
  */
 
 #include "utils.h"
+
 /*check if a pointer has a null value and retun error - for using after dynamic memory allocation
  * Params - void pointer *ptr and constant string for error massage*/
 void validateMemoryAllocation(void* ptr, char* desc){

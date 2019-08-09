@@ -1,13 +1,16 @@
-//
-// Created by ubuntu16 on 7/25/19.
-//
+/*This is a header file of constTables.c
+ *
+ *Writen by:
+ *Tom Cherchy   302649397
+ *Avrahamii XXXXXXXX
+ *
+ */
 
 #ifndef MAMAN14_CONSTSTABLES_H
 #define MAMAN14_CONSTSTABLES_H
 
 #include <string.h>
 #include "assembler.h"
-//#include "firstRead.h"
 
 /* ====== Functions Prototypes====== */
 
@@ -16,10 +19,6 @@
  */
 const command* getCmd(char* cmdName);
 
-/*
- * get command name and return its number of params or -1 if not exist
- */
-int getCmdNParams(char* cmdName);
 
 /*
  * get register name and return its code or -1 if not exist

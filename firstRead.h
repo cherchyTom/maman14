@@ -1,6 +1,10 @@
-//
-// Created by ubuntu16 on 7/26/19.
-//
+/*This is a header file of firstRead.c
+ *
+ *Writen by:
+ *Tom Cherchy   302649397
+ *Avrahamii XXXXXXXX
+ *
+ */
 
 #ifndef MAMAN14_FIRSTREAD_H
 #define MAMAN14_FIRSTREAD_H
@@ -15,8 +19,6 @@
 #include "memoryWord.h"
 #include "labelsQueue.h"
 
-/*=========Data Structures======*/
-
 
 /*========Prototypes =====*/
 
@@ -24,7 +26,7 @@
 int getCurrentLine();
 
 /* get int line number and set it to be currentLine value */
-void setCurrentLine(int lineNumeber);
+void setCurrentLine(int lineNumber);
 
 /* return isError value */
 boolean getErrorStatus();

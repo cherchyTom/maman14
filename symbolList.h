@@ -1,6 +1,11 @@
-//
-// Created by ubuntu16 on 7/4/19.
-//
+/*This is a header file of symbolList.c
+ *Contains symbolList data structures and prototypes
+ *
+ *Writen by:
+ *Tom Cherchy   302649397
+ *Avrahamii XXXXXXXX
+ *
+ */
 
 #ifndef MAMAN14_SYMBOLLIST_H
 #define MAMAN14_SYMBOLLIST_H
@@ -12,7 +17,7 @@
 
 /* symbol record data structure */
 typedef struct symbol_s {
-    char label[MAX_LABEL_LEN+1]; /* symbol name */
+    char label[MAX_LABEL_LEN+1]; /* symbol name (+1 for end of string char)*/
     sentanceType symbolType; /* code / instruction / macro*/
     instructionType instType; /* instruction type code */
     int value; /*address in memory or macro value*/
@@ -21,30 +26,21 @@ typedef struct symbol_s {
 
 /* Function Prototypes */
 
-/*@return symbol table list head */
-symbol* getSymbolListHead();
-
-/*@return symbol table list tail */
-symbol* getSymbolListTail();
-
-/* create new symbol
- * @params - symbol fields - label,sentanceType,instType, value
- * @return pointer to new symbol
- * In case of error print a massage and exit from the program
- */
-symbol* createSymbol(char *label,sentanceType symbolType,instructionType instType, int value);
-
 /* add Symbol to end of the table
  * in case symbol is already exist return error
-* @params - symbol record
+* @params - symbol fields - label,sentanceType,instType, value
 */
-void addSymbol(symbol* newSymbol);
+void addSymbol(char *label,sentanceType symbolType,instructionType instType, int value);
 
-/* search symbol in table by label
-* @params - symbol label
-* @return pointer to founded symbol or NULL in case it was not found
+/* get symbol name (label) and pointer to int (value) to retrieve the symbol value into
+* @return True if symbol was found otherwise false
 */
-symbol* searchSymbolByLabel(char* label);
+boolean getSymbolValue(char* label, int *value);
+
+/* search for symbol and retrieve its fields.
+ * get symbol label (name) to search and pointers to value and symbol type to retrieve  the parameters into
+ */
+boolean getSymbolParams(char* label, int *value, sentanceType *symbolType, instructionType *instType);
 
 /* search a symbol in table by label
 * @params - symbol label
@@ -57,17 +53,6 @@ boolean isExternalSymbol(char* label);
 * @return TRUE if exist otherwise false
 */
 boolean isMacroExist(char* label);
-
-/* get address of symbol
-* @params - symbol record
-* @return symbol value
-*/
-int getSymbolValue(char* label);
-
-/* search for symbol and retrieve its fields.
- * get symbol label (name) to search and pointers to value and symbol type to retrieve  the parameters into
- */
-boolean getSymbolValues(char* label, int *value, sentanceType *symbolType, instructionType *instType);
 
 /* update data/string symbol addresses by given offset
  * @params - int offset - to increase address by

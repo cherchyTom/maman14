@@ -1,7 +1,10 @@
-//
-// Created by ubuntu16 on 8/5/19.
-//
-
+/*This is a header file of secondRead.c
+ *
+ *Writen by:
+ *Tom Cherchy   302649397
+ *Avrahamii XXXXXXXX
+ *
+ */
 #ifndef MAMAN14_SECONDREAD_H
 #define MAMAN14_SECONDREAD_H
 

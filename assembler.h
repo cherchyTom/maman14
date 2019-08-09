@@ -1,6 +1,11 @@
-//
-// Created by ubuntu16 on 7/4/19.
-//
+/*This is the main header file of the program
+ * Contains the program constant definitions and main data structures
+ *
+ *Writen by:
+ *Tom Cherchy   302649397
+ *Avrahamii XXXXXXXX
+ *
+ */
 
 #ifndef MAMAN14_ASSEMBLER_H
 #define MAMAN14_ASSEMBLER_H

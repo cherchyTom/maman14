@@ -1,12 +1,16 @@
-//
-// Created by ubuntu16 on 7/25/19.
-//
+/*This file holds the program constant tables and functions to search and retreive data from them.
 
+ *
+ *Writen by:
+ *Tom Cherchy   302649397
+ *Avrahamii XXXXXXXX
+ *
+ */
 #include "constsTables.h"
 
 /* ====== Commands List ====== */
 const command cmdArr[] =
-        {	/* Name | Opcode | NumOfParams */
+        {	/* Name | opcode | NumOfParams */
                 { "mov", 0, 2 } ,
                 { "cmp", 1, 2 } ,
                 { "add", 2, 2 } ,
@@ -62,6 +66,9 @@ const instruction instructionArr[] =
 
 /* ====== Functions ====== */
 
+/*
+ * get command name and return pointer to its struct or NULL if not exist
+ */
 const command* getCmd(char* cmdName){
     const command* cmd = cmdArr;
     while(cmd->name){
@@ -73,6 +80,9 @@ const command* getCmd(char* cmdName){
     return NULL;
 }
 
+/*
+ * get command name and return its code or -1 if not exist
+ */
 static int getCmdCode(char* cmdName){
     const command* cmd = cmdArr;
     while(cmd->name){
@@ -84,17 +94,9 @@ static int getCmdCode(char* cmdName){
     return -1 ;
 }
 
-int getCmdNParams(char* cmdName){
-    const command* cmd = cmdArr;
-    while(cmd->name){
-        if(!strcmp(cmd->name,cmdName))
-            return cmd->numOfParams;
-        cmd++;
-    }
-    /* command name was not found*/
-    return -1;
-}
-
+/*
+ * get register name and return its code or -1 if not exist
+ */
 int getRegCode(char* regName){
     const rgstr* reg = regArr;
     while(reg->name){
@@ -106,11 +108,16 @@ int getRegCode(char* regName){
     return -1;
 }
 
+/*
+ * get string and return true if it is a reserved word (command or register name) otherwise return false
+ */
 boolean isReservedWord (char* word){
     return (getCmdCode(word) != -1 || getRegCode(word) != -1) ? TRUE : FALSE;
 }
 
-
+/*
+ * get instruction name and return pointer to the relevant instruction struct or to invalid struct in case name is not found
+ */
 const instruction* getInstructionByName(char* name){
     const instruction *inst = instructionArr;
     while(inst->type != INVALID_INSTRUCTION){

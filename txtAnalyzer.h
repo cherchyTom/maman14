@@ -1,7 +1,10 @@
-//
-// Created by ubuntu16 on 7/25/19.
-//
-
+/*This is a header file of txtAnalyzer.c
+ *
+ *Writen by:
+ *Tom Cherchy   302649397
+ *Avrahamii XXXXXXXX
+ *
+ */
 #ifndef MAMAN14_TXTANALYZER_H
 #define MAMAN14_TXTANALYZER_H
 
@@ -9,10 +12,6 @@
 #include <ctype.h>
 #include "assembler.h"
 #include "utils.h"
-#include "constsTables.h"
-
-/*====MACROS====== */
-
 
 
 /*====Functions Prototypes====== */
@@ -23,17 +22,12 @@
 void leftTrim(char **str);
 
 /* Removes white spaces from the end of a string */
-/* get pointer to char */
+/* get pointer to char* to adjust*/
 
 void rightTrim(char *str);
 
 /*retrieve first part from a string str to buf by a given delimiter or by the end of string */
 void getNextWordByDelimiter(char *buf, char *str, char delimiter,int bufSize);
-
-/*
-*get a string and return true if contains only whitespaces chars otherwise return false
-*/
-boolean isEmptySTR(char* str);
 
 /*
  *get a string numStr and convert it to signed integer
@@ -46,8 +40,9 @@ boolean isEmptySTR(char* str);
 boolean isLegalNum(char *numStr, int numOfBits, int *numInt, int isSigned);
 
 /*
- * get Label/ Macro name and return true if is valid otherwise return true
+ *get a string and return true if contains only alphanumeric chars otherwise return false
  */
-boolean isValidLabel(char* label);
+boolean isalnumSTR(char* str);
+
 
 #endif //MAMAN14_TXTANALYZER_H

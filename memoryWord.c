@@ -1,6 +1,12 @@
-//
-// Created by ubuntu16 on 8/1/19.
-//
+/*This file implements and manages the memoryWord module.
+ *The memoryWord codes and holds all the memory words from the first and second read processing, that need to be writen in the output files.
+ *The memoryWord is implemented as a linked list, and provide functions to operate it as a queue.
+ *
+ *Writen by:
+ *Tom Cherchy   302649397
+ *Avrahamii XXXXXXXX
+ *
+ */
 
 #include "memoryWord.h"
 
@@ -17,15 +23,6 @@ static memoryWord *dataListHead;
 static memoryWord *dataListTail;
 
 /* =======Functions ======*/
-
-/* return current data counter */
-memoryWord* getCodeTail(){
-    return codeListTail;
-}
-/* return current data counter */
-memoryWord* getDatahead(){
-    return dataListHead;
-}
 
 int getDC(){
     return DC;
@@ -48,8 +45,9 @@ void resetIC(){
  * Params - given list head and tail, new word to add, word address*/
 static void addToMemoryList(memoryWord **listHead,memoryWord **listTail, memoryWord *newWord, int address ){
     newWord->address = address; /* set address */
+    newWord->nextWord = NULL;
     /* empty list */
-    if(!listHead || !*listHead){
+    if( !listHead || !*listHead){
         *listHead = newWord;
         *listTail = newWord;
     }
@@ -60,7 +58,7 @@ static void addToMemoryList(memoryWord **listHead,memoryWord **listTail, memoryW
 }
 
 /* create memory word record set it in list and return a pointer to it */
-memoryWord* createMemoryWord(segmentType segType){
+static memoryWord* createMemoryWord(segmentType segType){
     memoryWord *newMW = (memoryWord*)malloc(sizeof(memoryWord));
     validateMemoryAllocation(newMW,"when creating new memory word record\n");
     /*validate memory size */
@@ -244,10 +242,7 @@ void clearMemoryWordList(){
         free(wordToDelete);
     }
     /*initiate pointers to code and data memory lists*/
-    //codeListHead = codeListTail = dataListHead = dataListTail = NULL;
-    codeListHead=NULL;
-    dataListHead = NULL;
-
+    codeListHead = codeListTail = dataListHead = dataListTail = NULL;
     return;
 }
 

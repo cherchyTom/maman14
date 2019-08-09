@@ -33,8 +33,8 @@ int getCurrentLine(){
 }
 
 /* get int line number and set it to be currentLine value */
-void setCurrentLine(int lineNumeber){
-    currentLine = lineNumeber;
+void setCurrentLine(int lineNumber){
+    currentLine = lineNumber;
     return;
 }
 
@@ -96,10 +96,46 @@ static boolean isValidLineLength(char *line){
     return (strlen(line)<= MAX_LINE_LEN) ? TRUE : FALSE;
 }
 
+static boolean isValidLabel(char* label){
+
+    /*is empty label*/
+    if(!label){
+        ERORR_MSG(("Empty Label is defined\n"));
+        return FALSE;
+    }
+
+    /* check for first letter*/
+    if(!isalpha(*label)){
+        ERORR_MSG(("Label must start with a letter\n"));
+        return FALSE;
+    }
+
+    /* check for alphanumeric chars*/
+    if(!isalnumSTR(label)){
+        ERORR_MSG(("Label must contains only alphanumeric chars\n"));
+        return FALSE;
+    }
+
+    /* check for valid length*/
+    if(strlen(label)> MAX_LABEL_LEN ){
+        ERORR_MSG(("Label must contains maximum %d chars\n",MAX_LABEL_LEN));
+        return FALSE;
+    }
+
+    /* check for reserved word*/
+    if(isReservedWord(label)){
+        ERORR_MSG(("Label %s is define as a reserved word\n",label));
+        return FALSE;
+    }
+
+    /* passed all validations */
+    return TRUE;
+
+}
+
 /* Return true if line represent a macro statement otherwise false
  * update line info(statement type & lineSTR) in case of macro
  * */
-
 static boolean isMacroStatement(lineInfo *line){
     char nextWord[MAX_LINE_LEN+1];
     /*skip spaces and retrieve first word */
@@ -158,7 +194,7 @@ static void macroParse(char* lineStr){
     }
 
     /* macro is valid - add it to symbol table */
-    addSymbol(createSymbol(macroLabel,MACRO,INVALID_INSTRUCTION,macroValue));
+    addSymbol(macroLabel,MACRO,INVALID_INSTRUCTION,macroValue);
     return;
 }
 
@@ -245,7 +281,7 @@ void parseDataParams(lineInfo*line){
             return;
         /* check if param is a valid number or macro*/
         if(isMacroExist(nextWord))
-            parameterValue = getSymbolValue(nextWord);
+            getSymbolValue(nextWord,&parameterValue);
         else if(!isLegalNum(nextWord,MEMORY_WORD_BITS,&parameterValue,1)) {
             return;
         }
@@ -340,7 +376,7 @@ void parseExtEntParams(lineInfo*line){
 
     /*In case of extern instruction add declared parameter to symbol list*/
     if(line->instStruct->type == EXTERN)
-        addSymbol(createSymbol(nextWord,INSTRUCTION,EXTERN,EXTERN_DEFAULT_ADDRESS));
+        addSymbol(nextWord,INSTRUCTION,EXTERN,EXTERN_DEFAULT_ADDRESS);
     /* in case of entry add the declared param to label queue in order to handle on second read */
     else
         addLabelToQ(ENTRY_LABEL,nextWord,FALSE,DEFAULT_MEMORY_VALUE,currentLine);
@@ -359,12 +395,12 @@ static void AddLabelToSymbolList(lineInfo *line){
     if(line->lineType == INSTRUCTION) {
         /*in case of data or string instruction add label to symbol list*/
         if (line->instStruct->type == DATA || line->instStruct->type == STRING)
-            addSymbol(createSymbol(line->labelValue, INSTRUCTION, line->instStruct->type, getDC()+ FIRST_ADDRESS));
+            addSymbol(line->labelValue, INSTRUCTION, line->instStruct->type, getDC()+ FIRST_ADDRESS);
         else
             /* In case of entry or extern instruction remove label and warn about it*/
         LABEL_WARNING(line)
     }else /* CODE (command) */
-        addSymbol(createSymbol(line->labelValue, CODE, INVALID_INSTRUCTION, getIC()+ FIRST_ADDRESS));
+        addSymbol(line->labelValue, CODE, INVALID_INSTRUCTION, getIC()+ FIRST_ADDRESS);
     return;
 }
 
@@ -447,7 +483,7 @@ static boolean isValidOffset(operandInfo *opInfo, char* offset){
     offset[strlen(offset)-1] = '\0';
     /*validate offset is macro or defined number */
     if(isMacroExist(offset))
-        opInfo->offset = getSymbolValue(offset);
+        getSymbolValue(offset,&(opInfo->offset));
     else if(!isLegalNum(offset,ADDRESS_BITS,&opInfo->offset,0))
         return FALSE;
     /*validate offset is positive */
@@ -470,7 +506,7 @@ static boolean getOperandInfo(operandInfo *opInfo, char*operand){
         operand++; /*skip '#' */
         /*validate operand is a defined macro or a number */
         if(isMacroExist(operand))
-            opInfo->value = getSymbolValue(operand);
+             getSymbolValue(operand,&(opInfo->value));
         else if(!isLegalNum(operand,ADDRESS_BITS,&opInfo->value,1))
             return FALSE;
 
@@ -498,8 +534,7 @@ static boolean getOperandInfo(operandInfo *opInfo, char*operand){
     }
     opInfo->type = LABEL;
     strcpy(opInfo->label,operand);
-    if(searchSymbolByLabel(operand)) {
-        opInfo->value = getSymbolValue(operand);
+    if(getSymbolValue(operand,&(opInfo->value))) {
         opInfo->isDefinedLabel = TRUE;
     } else
         opInfo->isDefinedLabel = FALSE;

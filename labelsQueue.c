@@ -1,7 +1,13 @@
-//
-// Created by ubuntu16 on 8/5/19.
-//
-
+/*This file implements and manages the labelQueue module.
+ *The Label queue contains all the labels from the first read processing that need to be re processed during the second read -
+ *  entry labels and labes that used as operands
+ *The label queue is implemented as a linked list, and provide functions to operate it as a queue.
+ *
+ *Writen by:
+ *Tom Cherchy   302649397
+ *Avrahamii XXXXXXXX
+ *
+ */
 #include "labelsQueue.h"
 
 /* =======Global Variables ======*/
