@@ -52,4 +52,4 @@ boolean isEmptyQ();
 /*delete labelsQ records and initiate global parameters */
 void clearLabelsQ();
 
-#endif //MAMAN14_LABELSQUEUE_H
+#endif

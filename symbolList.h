@@ -65,4 +65,4 @@ void updateDataSymbolsByOffset(int offset);
 void clearSymbolTable();
 
 
-#endif //MAMAN14_SYMBOLLIST_H
+#endif

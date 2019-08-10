@@ -35,4 +35,4 @@ boolean isReservedWord (char* word);
  */
 const instruction* getInstructionByName(char* name);
 
-#endif //MAMAN14_CONSTSTABLES_H
+#endif

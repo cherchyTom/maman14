@@ -105,7 +105,7 @@ void addStringMemoryWord(char* param);
 void mergeCodeAndDataSegments();
 
 /*get params from first memory word in list
-/* Params - pointers to variables to save struct fields*/
+ *Params - pointers to variables to save struct fields*/
 void getNextWordParams(int *address, int *word);
 
 /* get address memory word params and set them on the first memory word
@@ -121,4 +121,4 @@ boolean isEmptyCodeListQ();
 /* clear memory word list */
 void clearMemoryWordList();
 
-#endif //MAMAN14_MEMORYWORD_H
+#endif

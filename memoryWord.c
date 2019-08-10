@@ -13,8 +13,8 @@
 /* =======Global Variables ======*/
 
 /* instruction and data counter*/
-static IC = 0;
-static DC = 0;
+static int IC = 0;
+static int DC = 0;
 
 /*pointers to symbol list head and tail*/
 static memoryWord *codeListHead;
@@ -76,7 +76,7 @@ static memoryWord* createMemoryWord(segmentType segType){
         ERORR_MSG(("Invalid Memory Type - Cannot handle\n"));
     }
     return newMW;
-};
+}
 
 /* get first code memory params and add it to code memory list
  * @params - are code, dest & src operands addressing code, operation code */
@@ -187,7 +187,7 @@ void mergeCodeAndDataSegments(){
 }
 
 /*get params from first memory word in list
-/* Params - pointers to variables to save struct fields*/
+ * Params - pointers to variables to save struct fields*/
 void getNextWordParams(int *address, int *word){
     /*empty list */
     if(!codeListHead){

@@ -17,6 +17,8 @@
 /*=======external functions prototypes=======*/
 /* return currentLine value */
 extern int getCurrentLine();
+/* return isError value */
+extern boolean getErrorStatus();
 /* get boolean status and set it to be isError value */
 extern void setErrorStatus(boolean status);
 
@@ -35,7 +37,6 @@ extern void setErrorStatus(boolean status);
 /*check if a pointer has a null value and retun error - for using after dynamic memory allocation
  * Params - void pointer *ptr and constant string for error massage*/
 void validateMemoryAllocation(void* ptr, char* desc);
-#endif //MAMAN14_UTILS_H
 
 /*try to open a file with a given name ,postfix and mode (permissions)
  *In case of success return a pointer to FILE structure otherwise exit from the program
@@ -59,3 +60,5 @@ void closeOutputFile(char*fileName, char* filePostfix, FILE* fd);
 /*get int num which is stored in numOfBits bits and return it in spacial base 4 format as a string, stored in input char*param
  *assumption - num of bits >= 2*/
 void intToSpecial4Base(int num, int numOfBits, char* specialBaseNum);
+
+#endif

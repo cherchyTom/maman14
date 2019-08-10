@@ -11,8 +11,8 @@
 #include "firstRead.h"
 
 /*==== global variables =====*/
-static currentLine = 0; /* represents the managed line number */
-static isError = FALSE; /*flag represent if a file read contains an error*/
+static int currentLine = 0; /* represents the managed line number */
+static boolean isError = FALSE; /*flag represent if a file read contains an error*/
 
 
 /*====== MACROS ======== */
@@ -87,7 +87,7 @@ static void resetLine(lineInfo* line) {
 }
 
 /* Return true  ';' appears at the beginning of the line otherwise false*/
-static isCommentLine(char *line){
+static boolean isCommentLine(char *line){
     return (*line== ';') ? TRUE : FALSE;
 }
 
@@ -521,10 +521,10 @@ static boolean getOperandInfo(operandInfo *opInfo, char*operand){
     }
 
     /*Check for offset in order to separate between label and offset*/
-    if(offsetStartPosition = strchr(operand,OFFSET_START)){
+    if((offsetStartPosition = strchr(operand,OFFSET_START))){
         isOffset = 1;
         *offsetStartPosition = '\0';
-        *offsetStartPosition++;
+        offsetStartPosition++;
     }
 
     /*validate label name, update opInfo and retrieve its value if already defined */

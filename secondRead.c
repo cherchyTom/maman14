@@ -13,7 +13,7 @@
 /*write the first line in output object file.
  * Assumption - an object file will be created to DC = 0 && IC = 0 (no code or instruction in input file.
  *Param - pointer to FILE */
-static writeObjectFirstLine(FILE *fd){
+static void writeObjectFirstLine(FILE *fd){
     fprintf(fd,"\t%d\t%d\n",getIC(),getDC());
     return;
 }
@@ -21,7 +21,7 @@ static writeObjectFirstLine(FILE *fd){
 
 /*write memory address and  memory word, in special base, in output object file.
  *Param - pointer to FILE, address of word, memory word (integer) */
-static writeObjectLine(FILE *fd, int address, int wordValue){
+static void writeObjectLine(FILE *fd, int address, int wordValue){
     char specialBaseNum[MEMORY_WORD_BITS/2 +1]; /* set enough memory to store 4 based memory word + end of string sign */
     intToSpecial4Base(wordValue,MEMORY_WORD_BITS,specialBaseNum); /*convert int to spacial base string*/
     fprintf(fd,"%04d\t%s\n",address,specialBaseNum);

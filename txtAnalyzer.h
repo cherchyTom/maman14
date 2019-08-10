@@ -30,6 +30,11 @@ void rightTrim(char *str);
 void getNextWordByDelimiter(char *buf, char *str, char delimiter,int bufSize);
 
 /*
+ *get a string and return true if contains only whitespaces chars otherwise return false
+ */
+boolean isEmptySTR(char* str);
+
+/*
  *get a string numStr and convert it to signed integer
  * @Param *numStr - string to convert
  * @Param *numInt - pointer to save the converted number
@@ -45,4 +50,4 @@ boolean isLegalNum(char *numStr, int numOfBits, int *numInt, int isSigned);
 boolean isalnumSTR(char* str);
 
 
-#endif //MAMAN14_TXTANALYZER_H
+#endif

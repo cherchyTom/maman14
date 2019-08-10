@@ -38,4 +38,4 @@ void setErrorStatus(boolean status);
  * line parsing -> code validation -> create symbol list, memory word list and label list for second read
  *@Param pointer to lineInfo struct  */
 void firstRead(FILE*fd);
-#endif //MAMAN14_FIRSTREAD_H
+#endif
