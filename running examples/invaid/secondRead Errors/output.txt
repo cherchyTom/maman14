@@ -1,0 +1,11 @@
+Start processing "running examples/invaid/secondRead Errors/secondReadError.as" file.
+Error in line 4:
+Label "NONE" is not defined.
+Error in line 6:
+Macro name "MACRO" cannot declared or used as a label.
+Error in line 15:
+Label "NONE" is not defined.
+Error in line 17:
+Macro name "MACRO" cannot declared or used as a label.
+Finish processing "running examples/invaid/secondRead Errors/secondReadError.as" file with errors.
+

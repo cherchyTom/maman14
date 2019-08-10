@@ -1,0 +1,60 @@
+Start processing "running examples/invaid/FirstRead Errors/firstReadErrors.as" file.
+Error in line 4:
+symbol sz is declared more then once
+Error in line 5:
+Label must start with a letter
+Error in line 6:
+Expecting for '=' when defining macro: N
+Error in line 7:
+Invalid parameter "34fyf" - expecting to get a number
+Error in line 11:
+Label must contains only alphanumeric chars
+Error in line 11:
+Invalid command name 'MA$!N:"
+Error in line 12:
+Invalid command name 'MAIN"
+Error in line 13:
+No command/ instruction after label definition
+Waring in line 17:
+Label is define before extern or entry instruction
+Error in line 18:
+Label must start with a letter
+Error in line 19:
+Label must start with a letter
+Waring in line 21:
+Label is define before extern or entry instruction
+Error in line 22:
+Label must start with a letter
+Error in line 23:
+Invalid parameter "len" - expecting to get a number
+Error in line 24:
+Invalid ',' char - Expect to get a number before comma
+Error in line 25:
+There is a comma at the end of the line - Expecting for additional param
+Error in line 26:
+There is a comma at the end of the line - Expecting for additional param
+Error in line 28:
+Invalid parameter abcdef on .string declaration - Parameter must be enclosed by quotes
+Error in line 29:
+Invalid parameter abcdef  on .string declaration - Parameter must be enclosed by quotes
+Error in line 30:
+Invalid parameter abcdef" on .string declaration - Parameter must be enclosed by quotes
+Error in line 31:
+Invalid parameter  "fdf"  on .string declaration - Expecting for exactly 1 parameter
+Error in line 32:
+There is no parameter on .string declaration - Expecting for exactly 1 parameter
+Error in line 35:
+Invalid amount of operands. "prn" expect to get exactly 1 operands
+Error in line 36:
+Invalid amount of operands. "prn" expect to get exactly 1 operands
+Error in line 37:
+Invalid Operand Type: Target operand of "mov" cannot be a number
+Error in line 38:
+Empty parameter - expecting to get a number
+Error in line 39:
+Invalid parameter "n" - expecting to get a number
+Error in line 40:
+There is a comma at the end of the line
+Error in line 41:
+Invalid command name 'move"
+Failed to process "running examples/invaid/FirstRead Errors/firstReadErrors.as" file.
