@@ -91,7 +91,7 @@ int main(int argc, char *argv[]){
 
     /* check for valid argument amount */
     if(argc < 2) {
-        perror("Please run with at list one file name argument\n");
+        printf("Please run with at list one file name argument\n");
         return 1;
     }
     /*send each file from the argument line to parsing*/
